@@ -5,7 +5,7 @@ import pandas as pd
 df = pd.read_csv("agribalyse-31-detail-par-etape.csv", delimiter=';', dtype=str)
 
 def filtrer_produit(code_ciqual, etape):
-    produit_filtre = df[df['"Code CIQUAL"'] == code_ciqual]
+    produit_filtre = df[df['Code CIQUAL'] == code_ciqual]
     if produit_filtre.empty:
         return "Aucun produit trouvé pour ce Code CIQUAL."
     
