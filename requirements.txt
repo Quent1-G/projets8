@@ -1,3 +1,2 @@
-ploty
-pandas
 streamlit
+pandas
