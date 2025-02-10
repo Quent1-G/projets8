@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 # Charger la base de données
-df = pd.read_csv("agribalyse-31-detail-par-etape.csv", delimiter=';', dtype=str)
+df = pd.read_csv("agribalyse-31-detail-par-etape.csv", delimiter=',', dtype=str)
 
 def filtrer_produit(code_ciqual, etape):
     # Vérifier le type et filtrer correctement
