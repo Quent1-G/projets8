@@ -3,7 +3,7 @@ import pandas as pd
 
 # Charger la base de données
 df = pd.read_csv("agribalyse-31-detail-par-etape.csv", delimiter=';', dtype=str)
-df.head(5)
+print(df.head(5))
 def filtrer_produit(code_ciqual, etape):
     # Vérifier le type et filtrer correctement
     produit_filtre = df[df['Code CIQUAL'].astype(str) == str(code_ciqual)]
