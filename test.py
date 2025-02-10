@@ -3,15 +3,8 @@ import pandas as pd
 
 # Charger la base de données
 df = pd.read_csv("agribalyse-31-detail-par-etape.csv", delimiter=';', dtype=str)
-
-# Affichage des colonnes disponibles (pour le debug si nécessaire)
-st.write("Colonnes disponibles :", df.columns.tolist())
-
+df.head(5)
 def filtrer_produit(code_ciqual, etape):
-    # Assurer que la colonne 'Code CIQUAL' existe bien
-    if 'Code CIQUAL' not in df.columns:
-        return "Erreur : La colonne 'Code CIQUAL' est introuvable dans le fichier."
-
     # Vérifier le type et filtrer correctement
     produit_filtre = df[df['Code CIQUAL'].astype(str) == str(code_ciqual)]
     
