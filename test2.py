@@ -21,38 +21,57 @@ def filtrer_produit(code_ciqual, etape):
     infos = produit_filtre[colonnes_etape].T.dropna()
     return infos
 
-def filtrer_ingredients(code_ciqual):
+def filtrer_ingredients(code_ciqual, ingredient_selectionne):
     produit_ingredients = df_ingredients[df_ingredients['Ciqual  code'].astype(str) == str(code_ciqual)]
     if produit_ingredients.empty:
         return "Aucun ingrédient trouvé pour ce Code CIQUAL."
     
-    # Colonnes index 1 et de 6 à 23
-    colonnes_affichage = list(df_ingredients.columns[[1]] ) + list(df_ingredients.columns[6:24])
-    return produit_ingredients[colonnes_affichage]
+    # Colonnes d'index 6 à 23 (indicateurs environnementaux)
+    colonnes_impact = df_ingredients.columns[6:24]
+    
+    if ingredient_selectionne:
+        # Filtrer uniquement l'ingrédient sélectionné
+        produit_ingredients = produit_ingredients[produit_ingredients['Ingredients'] == ingredient_selectionne]
+    
+    if produit_ingredients.empty:
+        return f"Aucun résultat pour l'ingrédient '{ingredient_selectionne}'."
+
+    # Création du tableau final
+    impact_values = produit_ingredients[colonnes_impact].T
+    impact_values.columns = [ingredient_selectionne]  # Nommer la colonne par l'ingrédient
+    impact_values.insert(0, "Impact environnemental", impact_values.index)  # Ajouter la première colonne
+    return impact_values.reset_index(drop=True)
 
 # Interface Streamlit
 st.title("Analyse des produits agro-alimentaires")
 
-# Interface utilisateur
+# Zone de saisie du Code CIQUAL
 code_ciqual = st.text_input("Entrez un Code CIQUAL")
 
-# Liste des étapes et des ingrédients
-etapes = ["Agriculture", "Transformation", "Emballage", "Transport", "Supermarché et distribution", "Consommation"]
-etape_selectionnee = st.radio("Choisissez une étape du cycle de vie", etapes)
+# Vérifier si un Code CIQUAL est entré
+if code_ciqual:
+    # Liste des étapes
+    etapes = ["Agriculture", "Transformation", "Emballage", "Transport", "Supermarché et distribution", "Consommation"]
+    etape_selectionnee = st.radio("Choisissez une étape du cycle de vie", etapes)
 
-# Récupérer les ingrédients disponibles
-ingredients_disponibles = df_ingredients['Ingredients'].dropna().unique().tolist()
-ingredients_selectionnes = st.multiselect("Sélectionnez des ingrédients", ingredients_disponibles)
+    # Affichage du tableau des résultats
+    st.subheader("Données du produit")
+    result = filtrer_produit(code_ciqual, etape_selectionnee)
+    st.write(result)
 
-if st.button("Afficher les résultats"):
-    col1, col2 = st.columns(2)  # Deux colonnes pour l'affichage
+    # Récupérer les ingrédients disponibles pour ce Code CIQUAL
+    ingredients_dispo = df_ingredients[df_ingredients['Ciqual  code'].astype(str) == str(code_ciqual)]['Ingredients'].dropna().unique().tolist()
 
-    with col1:
-        st.subheader("Données du produit")
-        result = filtrer_produit(code_ciqual, etape_selectionnee)
-        st.write(result)
+    if ingredients_dispo:
+        st.subheader("Sélection des ingrédients")
+        ingredient_selectionne = st.radio("Choisissez un ingrédient", ingredients_dispo)
 
-    with col2:
-        st.subheader("Ingrédients")
-        result_ing = filtrer_ingredients(code_ciqual)
+        # Affichage du tableau des impacts environnementaux
+        st.subheader("Impacts environnementaux de l'ingrédient sélectionné")
+        result_ing = filtrer_ingredients(code_ciqual, ingredient_selectionne)
         st.write(result_ing)
+    else:
+        st.warning("Aucun ingrédient disponible pour ce produit.")
+
+else:
+    st.info("Veuillez entrer un Code CIQUAL pour voir les données.")
