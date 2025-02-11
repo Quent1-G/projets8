@@ -3,7 +3,7 @@ import pandas as pd
 
 # Charger les bases de données
 df = pd.read_csv("agribalyse-31-detail-par-etape.csv", delimiter=',', dtype=str)
-df_ingredients = pd.read_csv("Agribalyse_Details ingredient.csv", delimiter=',', dtype=str)  # Remplace par le bon chemin
+df_ingredients = pd.read_csv("Agribalyse_Detail ingredient.csv", delimiter=',', dtype=str)  # Remplace par le bon chemin
 
 # Normaliser les noms de colonnes pour éviter les erreurs d'espace ou casse
 df.columns = df.columns.str.strip()
