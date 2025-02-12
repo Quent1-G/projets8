@@ -35,13 +35,13 @@ def app():
 
     ####################################################################### Contenu principal en pleine largeur######################################################################
     st.markdown('<div class="main-container">', unsafe_allow_html=True)
-    st.write("Explorez l'impact environnemental de votre alimentation")
+    st.write("###Explorez l'impact environnemental de votre alimentation")
     st.write("""
         Aujourd’hui, la consommation alimentaire a un impact environnemental croissant. 
         Il est donc essentiel de mieux comprendre les effets de nos choix alimentaires. 
         Grâce à l’Analyse du Cycle de Vie (ACV) et aux données d'Agribalyse, nous vous proposons un outil interactif pour explorer l’empreinte écologique de votre panier alimentaire.
         
-        ### Ce site vous permet de :
+        Ce site vous permet de :
         - **Rechercher** des aliments et constituer votre panier personnalisé.
         - **Accéder** aux impacts environnementaux de chaque aliment ainsi qu'à l’empreinte globale de votre panier.
         - **Découvrir** les détails des ingrédients ou des étapes de production les plus impactantes.
