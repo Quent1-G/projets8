@@ -18,6 +18,7 @@ def app():
         st.sidebar.write("nous étudiants et bla bla bla...")
         ########################################### CONTENU PAGE ######################################
     # Contenu principal de la page
+    st.write("aujourd'hui, bla bla bla, la conso et la planete bla bal bla")
 # Lancer l'application
 if __name__ == "__main__":
     app()
