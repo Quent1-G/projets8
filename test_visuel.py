@@ -26,7 +26,7 @@ def app():
     
     ########################################################################### Titre de la page principale######################################################################
     st.title("Ce qu'on met dans nos assiettes...")
-    st.title(Quel impact sur la planète ?")
+    st.title("Quel impact sur la planète ?")
     ####################################################################### Bandeau latéral######################################################################
     st.sidebar.title("Contenu")
     st.sidebar.radio("Navigation", ["Accueil", "Contexte", "Méthodologie", "Analyse globale"])
