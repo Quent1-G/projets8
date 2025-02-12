@@ -18,11 +18,6 @@ def app():
         st.sidebar.write("nous étudiants et bla bla bla...")
         ########################################### CONTENU PAGE ######################################
     # Contenu principal de la page
-   # Contenu principal de la page
-with col1:
-    st.write("Voici le contenu de la page principale qui peut être défilé.")
-    st.write("Ajoutez du contenu ici, des graphiques, des tableaux, etc.")
-
 # Lancer l'application
 if __name__ == "__main__":
     app()
