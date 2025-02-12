@@ -51,60 +51,48 @@ def filtrer_ingredients(code_ciqual, ingredient_selectionne):
 # Style personnalisé
 st.markdown("""
     <style>
-        .title {
-            text-align: center;
-            font-size: 50px;
-            font-weight: bold;
-            color: #2E8B57;
+        .sidebar {
+            background-color: #A9DFBF;
+            padding: 20px;
+            height: 100vh;
         }
-        .result-box {
-            padding: 15px;
-            border-radius: 10px;
-            background-color: #F0F8FF;
-            margin-bottom: 20px;
+        .content {
+            padding: 20px;
         }
     </style>
 """, unsafe_allow_html=True)
 
-# Interface Streamlit
-st.markdown('<p class="title">📊 Analyse des Produits Agro-Alimentaires</p>', unsafe_allow_html=True)
+# Mise en page
+col1, col2 = st.columns([1, 3])
 
-# Zone de recherche
-search_query = st.text_input("🔍 Recherchez un produit par nom (ex: 'pomme', 'riz', etc.)")
+with col1:
+    st.markdown('<div class="sidebar">', unsafe_allow_html=True)
+    st.markdown("### 📊 Analyse des Produits Agro-Alimentaires")
+    search_query = st.text_input("🔍 Recherchez un produit")
+    st.markdown('</div>', unsafe_allow_html=True)
 
-if search_query:
-    produits_trouves = df_ingredients[df_ingredients["Nom Français"].str.contains(search_query, case=False, na=False)]
-    
-    if not produits_trouves.empty:
-        produit_selectionne = st.selectbox("🎯 Sélectionnez un produit", produits_trouves["Nom Français"].unique())
-        code_ciqual = produits_trouves[produits_trouves["Nom Français"] == produit_selectionne]["Ciqual  code"].values[0]
-        
-        st.success(f"✔️ Produit sélectionné : {produit_selectionne} (Code CIQUAL : {code_ciqual})")
-        
-        # Sélection d'une étape
-        etapes = ["Agriculture", "Transformation", "Emballage", "Transport", "Supermarché et distribution", "Consommation"]
-        etape_selectionnee = st.radio("🛠️ Choisissez une étape du cycle de vie", etapes)
-        
-        # Affichage des résultats
-        st.subheader("📌 Données du produit")
-        result = filtrer_produit(code_ciqual, etape_selectionnee)
-        st.markdown('<div class="result-box">', unsafe_allow_html=True)
-        st.write(result)
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-        # Sélection des ingrédients
-        ingredients_dispo = df_ingredients[df_ingredients['Ciqual  code'].astype(str) == str(code_ciqual)]['Ingredients'].dropna().unique().tolist()
-        
-        if ingredients_dispo:
-            st.subheader("🌿 Sélection des ingrédients")
-            ingredient_selectionne = st.radio("🔬 Choisissez un ingrédient", ingredients_dispo)
-            
-            st.subheader("🌍 Impacts environnementaux de l'ingrédient sélectionné")
-            result_ing = filtrer_ingredients(code_ciqual, ingredient_selectionne)
-            st.markdown('<div class="result-box">', unsafe_allow_html=True)
-            st.write(result_ing)
-            st.markdown('</div>', unsafe_allow_html=True)
+with col2:
+    st.markdown('<div class="content">', unsafe_allow_html=True)
+    if search_query:
+        produits_trouves = df_ingredients[df_ingredients["Nom Français"].str.contains(search_query, case=False, na=False)]
+        if not produits_trouves.empty:
+            produit_selectionne = st.selectbox("🎯 Sélectionnez un produit", produits_trouves["Nom Français"].unique())
+            code_ciqual = produits_trouves[produits_trouves["Nom Français"] == produit_selectionne]["Ciqual  code"].values[0]
+            st.success(f"✔️ Produit sélectionné : {produit_selectionne} (Code CIQUAL : {code_ciqual})")
+            etapes = ["Agriculture", "Transformation", "Emballage", "Transport", "Supermarché et distribution", "Consommation"]
+            etape_selectionnee = st.radio("🛠️ Choisissez une étape du cycle de vie", etapes)
+            st.subheader("📌 Données du produit")
+            result = filtrer_produit(code_ciqual, etape_selectionnee)
+            st.write(result)
+            ingredients_dispo = df_ingredients[df_ingredients['Ciqual  code'].astype(str) == str(code_ciqual)]['Ingredients'].dropna().unique().tolist()
+            if ingredients_dispo:
+                st.subheader("🌿 Sélection des ingrédients")
+                ingredient_selectionne = st.radio("🔬 Choisissez un ingrédient", ingredients_dispo)
+                st.subheader("🌍 Impacts environnementaux de l'ingrédient sélectionné")
+                result_ing = filtrer_ingredients(code_ciqual, ingredient_selectionne)
+                st.write(result_ing)
+            else:
+                st.warning("⚠️ Aucun ingrédient disponible pour ce produit.")
         else:
-            st.warning("⚠️ Aucun ingrédient disponible pour ce produit.")
-    else:
-        st.warning("🚫 Aucun produit ne correspond à votre recherche.")
+            st.warning("🚫 Aucun produit ne correspond à votre recherche.")
+    st.markdown('</div>', unsafe_allow_html=True)
