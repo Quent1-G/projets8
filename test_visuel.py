@@ -25,7 +25,7 @@ st.markdown(
 def app():
     
     ########################################################################### Titre de la page principale######################################################################
-    st.markdown("<h1 style='margin-bottom: 0; padding-bottom: 0;'>Ce qu'on met dans nos assiettes</h1><h1 style='margin-top: 0; padding-top: 0;'>Quel impact sur la planète ?</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='margin-bottom: 0; padding-bottom: 0;'>Ce qu'on met dans nos assiettes...</h1><h1 style='margin-top: 0; padding-top: 0;'>Quel impact sur la planète ?</h1>", unsafe_allow_html=True)
     
     ####################################################################### Bandeau latéral######################################################################
     st.sidebar.title("Contenu")
@@ -35,11 +35,21 @@ def app():
 
     ####################################################################### Contenu principal en pleine largeur######################################################################
     st.markdown('<div class="main-container">', unsafe_allow_html=True)
-
+    st.write("Explorez l'impact environnemental de votre alimentation")
     st.write("""
-    Aujourd'hui, bla bla bla, la consommation et la planète, bla bla bla.
-    Ce projet explore l'impact de nos choix alimentaires sur l'environnement.
-    """)
+        Aujourd’hui, la consommation alimentaire a un impact environnemental croissant. 
+        Il est donc essentiel de mieux comprendre les effets de nos choix alimentaires. 
+        Grâce à l’Analyse du Cycle de Vie (ACV) et aux données d'Agribalyse, nous vous proposons un outil interactif pour explorer l’empreinte écologique de votre panier alimentaire.
+        
+        ### Ce site vous permet de :
+        - **Rechercher** des aliments et constituer votre panier personnalisé.
+        - **Accéder** aux impacts environnementaux de chaque aliment ainsi qu'à l’empreinte globale de votre panier.
+        - **Découvrir** les détails des ingrédients ou des étapes de production les plus impactantes.
+        - **Explorer** un regroupement des aliments basé sur une analyse en composantes principales.
+        - **Profiter** d’un **nouveau score** développé pour évaluer l’impact environnemental des aliments de manière globale et compréhensible.
+        
+        🌱 **Faites des choix éclairés et responsables pour une alimentation plus durable !**
+        """)
     st.markdown('</div>', unsafe_allow_html=True)
 
 # Lancer l'application
