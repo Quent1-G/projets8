@@ -38,10 +38,11 @@ st.markdown(
 # Interface principale
 st.markdown('<div class="main-content">', unsafe_allow_html=True)
 
+################################################################################################## page principale
 # Titre de la page principale
 st.title("Mon Application Streamlit avec Bandeau Latéral Défilant")
 
-# Exemple de contenu sur la page principale
+# Exemple de contenu sur la page principale, sous la forme un texte, puis un autre texte
 st.write("Voici le contenu de la page principale qui peut être défilé.")
 st.write("Ajoutez du contenu ici, des graphiques, des tableaux, etc.")
 
@@ -50,6 +51,7 @@ for i in range(30):
 
 st.markdown('</div>', unsafe_allow_html=True)
 
+################################################################################################ page secondaire
 # Interface du bandeau latéral
 st.sidebar.markdown('<div class="sidebar">', unsafe_allow_html=True)
 
