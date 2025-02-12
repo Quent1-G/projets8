@@ -65,7 +65,7 @@ st.markdown(
         height: 100vh;  /* Hauteur maximale pour occuper toute la hauteur */
         background-color: #83ca69;  /* Couleur de fond du bandeau */
         overflow-y: auto;  /* Permet au bandeau d'être défilable */
-        padding: 20px;
+        padding: 10px;
         box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1);  /* Ajoute une ombre pour le contraste */
     }
 
