@@ -46,25 +46,25 @@ def filtrer_ingredients(code_ciqual, ingredient_selectionne):
 st.markdown(
     """
     <style>
-    /* Définir un fond et un padding pour la page principale */
+    /* Style pour le contenu principal */
     .main-content {
-        margin-left: 250px;  /* Espace pour le bandeau latéral */
+        margin-right: 250px;  /* Espace pour le bandeau latéral à droite */
         padding: 20px;
-        overflow-y: scroll;  /* Permet à la page principale d'être défilable */
-        height: 100vh;  /* Hauteur de la page */
+        overflow-y: scroll;
+        height: 100vh;  /* Remplir l'écran */
     }
 
-    /* Style du bandeau latéral (fixe sur le côté gauche) */
+    /* Style du bandeau latéral à droite */
     .sidebar {
-        position: absolute;
+        position: fixed;
         top: 0;
-        left: 0;
+        right: 0;  /* Fixer le bandeau à droite */
         width: 250px;  /* Largeur du bandeau */
-        height: 100vh;  /* Hauteur du bandeau latéral */
+        height: 100vh;  /* Hauteur maximale pour occuper toute la hauteur */
         background-color: #83ca69;  /* Couleur de fond du bandeau */
         overflow-y: auto;  /* Permet au bandeau d'être défilable */
         padding: 20px;
-        box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1);  /* Ajoute une ombre pour le contraste */
+        box-shadow: -2px 0px 5px rgba(0, 0, 0, 0.1);  /* Ombre à gauche pour séparation */
         z-index: 10;
     }
 
@@ -121,9 +121,10 @@ if search_query:
         st.warning("Aucun produit ne correspond à votre recherche.")
 
 ################################################################################################ page secondaire
-# Interface du bandeau latéral
+# Interface du bandeau latéral (à droite)
 st.sidebar.markdown('<div class="sidebar">', unsafe_allow_html=True)
 
+# Contenu du bandeau latéral
 st.sidebar.title("Options de Menu")
 st.sidebar.radio("Choisissez une option", ["Option 1", "Option 2", "Option 3"])
 st.sidebar.write("Plus de détails ici...")
