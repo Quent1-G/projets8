@@ -35,7 +35,8 @@ def app():
 
     ####################################################################### Contenu principal en pleine largeur######################################################################
     st.markdown('<div class="main-container">', unsafe_allow_html=True)
-    st.write("###Explorez l'impact environnemental de votre alimentation")
+    
+    st.write("### Explorez l'impact environnemental de votre alimentation")
     st.write("""
         Aujourd’hui, la consommation alimentaire a un impact environnemental croissant. 
         Il est donc essentiel de mieux comprendre les effets de nos choix alimentaires. 
