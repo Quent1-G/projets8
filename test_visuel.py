@@ -52,8 +52,9 @@ st.markdown(
     .main-content {
         margin-left: 250px;  /* Espace pour le bandeau latéral */
         padding: 20px;
+        padding-top: 100px;  /* Ajustement pour bien positionner le contenu */
         overflow-y: scroll;  /* Permet à la page principale d'être défilable */
-        height: 100vh;  /* Remplir l'écran */
+        height: calc(100vh - 100px);  /* Remplir l'écran sauf l'espace pour le bandeau latéral */
     }
 
     /* Style du bandeau latéral (fixe sur le côté gauche) */
@@ -65,7 +66,7 @@ st.markdown(
         height: 100vh;  /* Hauteur maximale pour occuper toute la hauteur */
         background-color: #83ca69;  /* Couleur de fond du bandeau */
         overflow-y: auto;  /* Permet au bandeau d'être défilable */
-        padding: 10px;
+        padding: 20px;
         box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1);  /* Ajoute une ombre pour le contraste */
     }
 
