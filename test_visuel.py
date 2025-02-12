@@ -1,12 +1,20 @@
 import streamlit as st
 
-# Ajouter du CSS pour forcer le contenu principal en pleine largeur
+# Appliquer du CSS pour forcer la pleine largeur
 st.markdown(
     """
     <style>
+        /* Forcer la largeur complète du contenu principal */
         .main-container {
-            max-width: 95%;  /* Utiliser presque toute la largeur */
-            padding: 0 5%;
+            max-width: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        /* Modifier la largeur de la page entière */
+        .appview-container .main, .block-container {
+            max-width: 100%;
+            padding-left: 1rem;
+            padding-right: 1rem;
         }
     </style>
     """,
@@ -24,7 +32,7 @@ def app():
     st.sidebar.write("### À propos")
     st.sidebar.write("Nous sommes des étudiants et bla bla bla...")
 
-    # Contenu principal dans un conteneur avec la classe CSS ajoutée
+    # Contenu principal en pleine largeur
     st.markdown('<div class="main-container">', unsafe_allow_html=True)
 
     st.write("""
