@@ -25,7 +25,7 @@ st.markdown(
 def app():
     
     ########################################################################### Titre de la page principale######################################################################
-    st.markdown("<h1 style='margin-bottom: 0;'>Ce qu'on met dans nos assiettes</h1><h1 style='margin-top: 0;'>Quel impact sur la planète ?</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='margin-bottom: 0; padding-bottom: 0;'>Ce qu'on met dans nos assiettes</h1><h1 style='margin-top: 0; padding-top: 0;'>Quel impact sur la planète ?</h1>", unsafe_allow_html=True)
     
     ####################################################################### Bandeau latéral######################################################################
     st.sidebar.title("Contenu")
