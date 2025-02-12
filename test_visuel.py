@@ -52,7 +52,7 @@ st.markdown(
     .main-content {
         margin-left: 250px;  /* Espace pour le bandeau latéral */
         padding: 20px;
-        padding-top: 100px;  /* Ajustement pour bien positionner le contenu */
+        padding-top: 150px;  /* Ajustement pour bien positionner le contenu */
         overflow-y: scroll;  /* Permet à la page principale d'être défilable */
         height: calc(100vh - 100px);  /* Remplir l'écran sauf l'espace pour le bandeau latéral */
     }
