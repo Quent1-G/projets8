@@ -25,8 +25,8 @@ st.markdown(
 def app():
     
     ########################################################################### Titre de la page principale######################################################################
-    st.markdown("### Ce qu'on met dans nos assiettes, \n### quel impact sur la planète ?")
-
+    st.title("Ce qu'on met dans nos assiettes...")
+    st.title(Quel impact sur la planète ?")
     ####################################################################### Bandeau latéral######################################################################
     st.sidebar.title("Contenu")
     st.sidebar.radio("Navigation", ["Accueil", "Contexte", "Méthodologie", "Analyse globale"])
