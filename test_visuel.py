@@ -23,27 +23,23 @@ st.markdown(
 
 # Fonction principale
 def app():
-    # Titre de la page principale
+    
+    ########################################################################### Titre de la page principale######################################################################
     st.title("Ce qu'on met dans nos assiettes, quel impact sur la planète ?")
 
-    # Bandeau latéral
+    ####################################################################### Bandeau latéral######################################################################
     st.sidebar.title("Contenu")
     st.sidebar.radio("Navigation", ["Accueil", "Contexte", "Méthodologie", "Analyse globale"])
     st.sidebar.write("### À propos")
     st.sidebar.write("Nous sommes des étudiants et bla bla bla...")
 
-    # Contenu principal en pleine largeur
+    ####################################################################### Contenu principal en pleine largeur######################################################################
     st.markdown('<div class="main-container">', unsafe_allow_html=True)
 
     st.write("""
     Aujourd'hui, bla bla bla, la consommation et la planète, bla bla bla.
     Ce projet explore l'impact de nos choix alimentaires sur l'environnement.
     """)
-
-    # Ajouter plus de contenu pour tester le défilement
-    for i in range(30):
-        st.write(f"Paragraphe d'exemple {i+1}")
-
     st.markdown('</div>', unsafe_allow_html=True)
 
 # Lancer l'application
