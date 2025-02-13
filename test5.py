@@ -155,3 +155,44 @@ if st.session_state.panier:
                 st.warning(f"Aucune donnée pour l'étape '{etape_selectionnee}'.")
         else:
             st.warning("Aucune donnée trouvée pour ce produit.")
+# Exploration des ingrédients
+st.subheader("🧑‍🍳 Ingrédients du produit sélectionné")
+
+# Vérifier si des ingrédients existent pour ce produit
+ingredients_dispo = df_ingredients[df_ingredients['Ciqual  code'].astype(str) == str(code_ciqual_choisi)]['Ingredients'].dropna().unique().tolist()
+
+if ingredients_dispo:
+    ingredient_selectionne = st.radio("Choisissez un ingrédient", ingredients_dispo, key="ingredient_produit")
+
+    impact_ingredient = df_ingredients[
+        (df_ingredients['Ciqual  code'].astype(str) == str(code_ciqual_choisi)) & 
+        (df_ingredients['Ingredients'] == ingredient_selectionne)
+    ]
+
+    if not impact_ingredient.empty:
+        colonnes_impact = impact_ingredient.columns[6:24]  # Colonnes des impacts environnementaux
+        impact_values = impact_ingredient[colonnes_impact].astype(float).T
+        impact_values.columns = [ingredient_selectionne]
+
+        # Ajout des unités
+        impact_values.insert(0, "Impact environnemental", impact_values.index)
+        impact_values["Unité"] = [unites_indicateurs.get(indic, "N/A") for indic in impact_values["Impact environnemental"]]
+
+        # Affichage du tableau
+        st.dataframe(impact_values.set_index("Impact environnemental"))
+
+        # Graphique coloré avec dégradé
+        fig = px.bar(
+            x=impact_values.index,
+            y=impact_values[ingredient_selectionne],
+            labels={'x': 'Indicateur environnemental', 'y': 'Valeur'},
+            title=f"Impacts environnementaux de {ingredient_selectionne}",
+            color=impact_values[ingredient_selectionne],
+            color_continuous_scale="RdYlGn_r"
+        )
+        st.plotly_chart(fig)
+    else:
+        st.warning(f"Aucun impact trouvé pour '{ingredient_selectionne}'.")
+else:
+    st.warning("Aucun ingrédient disponible pour ce produit.")
+
