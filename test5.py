@@ -120,15 +120,18 @@ if indicateurs_totaux is not None:
         contribution = contribution.sort_values(ascending=False)
 
         noms_produits = [item["nom"] for item in st.session_state.panier]
+
         fig = px.bar(
             x=noms_produits,
             y=contribution.values,
             labels={'x': 'Produit', 'y': 'Contribution (%)'},
-            title=f"Contribution des produits pour {selected_row}"
+            title=f"Contribution des produits pour {selected_row}",
+            color=contribution.values,
+            color_continuous_scale="RdYlGn_r"
         )
         st.plotly_chart(fig)
 
-# Exploration des détails d'un produit du panier
+# Ajout des unités dans la navigation des articles du panier
 if st.session_state.panier:
     st.subheader("🔍 Explorer un produit du panier")
     produit_choisi = st.selectbox("Sélectionnez un produit", [item["nom"] for item in st.session_state.panier])
@@ -145,28 +148,10 @@ if st.session_state.panier:
         if not result.empty:
             colonnes_etape = [col for col in df.columns if etape_selectionnee in col]
             if colonnes_etape:
-                st.write(result[colonnes_etape].T.dropna())
+                df_etape = result[colonnes_etape].T.dropna()
+                df_etape["Unité"] = [unites_indicateurs.get(col.split(" ")[0], "N/A") for col in df_etape.index]
+                st.write(df_etape)
             else:
                 st.warning(f"Aucune donnée pour l'étape '{etape_selectionnee}'.")
         else:
             st.warning("Aucune donnée trouvée pour ce produit.")
-
-        # Exploration des ingrédients
-        ingredients_dispo = df_ingredients[df_ingredients['Ciqual  code'].astype(str) == str(code_ciqual_choisi)]['Ingredients'].dropna().unique().tolist()
-
-        if ingredients_dispo:
-            st.subheader("Sélection des ingrédients")
-            ingredient_selectionne = st.radio("Choisissez un ingrédient", ingredients_dispo, key="ingredient_produit")
-
-            impact_ingredient = df_ingredients[(df_ingredients['Ciqual  code'].astype(str) == str(code_ciqual_choisi)) & (df_ingredients['Ingredients'] == ingredient_selectionne)]
-            if not impact_ingredient.empty:
-                colonnes_impact = impact_ingredient.columns[6:24]
-                impact_values = impact_ingredient[colonnes_impact].T
-                impact_values.columns = [ingredient_selectionne]
-                impact_values.insert(0, "Impact environnemental", impact_values.index)
-                st.write(impact_values.reset_index(drop=True))
-            else:
-                st.warning(f"Aucun impact trouvé pour '{ingredient_selectionne}'.")
-
-        else:
-            st.warning("Aucun ingrédient disponible pour ce produit.")
