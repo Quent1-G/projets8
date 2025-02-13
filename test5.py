@@ -83,8 +83,16 @@ if st.session_state.panier:
         if col2.button("❌", key=f"remove_{index}"):
             del st.session_state.panier[index]
             st.rerun()
+
+    # Vérifier si le panier contient des produits avant de calculer les indicateurs
+    if st.session_state.panier:
+        indicateurs_totaux, details_produits = calculer_indicateurs_panier()
+        st.subheader("📊 Indicateurs environnementaux du panier")
+        st.write(indicateurs_totaux)  # Affiche le tableau des indicateurs
+    
 else:
     st.info("Votre panier est vide.")
+
 
 # Calcul des indicateurs du panier
 indicateurs_totaux, details_produits = calculer_indicateurs_panier()
