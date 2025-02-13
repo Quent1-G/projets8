@@ -47,8 +47,10 @@ def calculer_indicateurs_panier():
     if produits_synthese.empty:
         return None, None
 
-    colonnes_impact = produits_synthese.columns[12:32]  
-    produits_synthese[colonnes_impact] = produits_synthese[colonnes_impact].astype(float)
+    colonnes_impact = produits_synthese.columns[12:32]
+    
+    # Sécuriser la conversion en float
+    produits_synthese[colonnes_impact] = produits_synthese[colonnes_impact].apply(pd.to_numeric, errors="coerce").fillna(0)
 
     total_impacts = produits_synthese.groupby("Code CIQUAL")[colonnes_impact].sum()
     total_somme = total_impacts.sum()
@@ -71,7 +73,7 @@ if st.session_state.ajouter_produit:
         if not produits_trouves.empty:
             produit_selectionne = st.selectbox("Sélectionnez un produit", produits_trouves["Nom Français"].unique())
 
-            code_ciqual = produits_trouves[produits_trouves["Nom Français"] == produit_selectionne]["Ciqual  code"].values[0]
+            code_ciqual = produits_trouves.loc[produits_trouves["Nom Français"] == produit_selectionne, "Ciqual  code"].values[0]
             st.success(f"Produit sélectionné : {produit_selectionne} (Code CIQUAL : {code_ciqual})")
 
             if st.button("Ajouter au panier"):
@@ -109,90 +111,47 @@ if indicateurs_totaux is not None:
 
     st.dataframe(df_indicateurs.set_index("Impact environnemental"))
 
-    selected_row = st.selectbox(
-        "Sélectionnez un indicateur pour voir la contribution des aliments",
-        df_indicateurs["Impact environnemental"]
-    )
+# Exploration des ingrédients
+st.subheader("🧑‍🍳 Ingrédients du produit sélectionné")
 
-    if selected_row:
-        contribution = details_produits[selected_row]
-        contribution = contribution / contribution.sum() * 100
-        contribution = contribution.sort_values(ascending=False)
-
-        noms_produits = [item["nom"] for item in st.session_state.panier]
-
-        fig = px.bar(
-            x=noms_produits,
-            y=contribution.values,
-            labels={'x': 'Produit', 'y': 'Contribution (%)'},
-            title=f"Contribution des produits pour {selected_row}",
-            color=contribution.values,
-            color_continuous_scale="RdYlGn_r"
-        )
-        st.plotly_chart(fig)
-
-# Ajout des unités dans la navigation des articles du panier
 if st.session_state.panier:
-    st.subheader("🔍 Explorer un produit du panier")
     produit_choisi = st.selectbox("Sélectionnez un produit", [item["nom"] for item in st.session_state.panier])
 
     if produit_choisi:
         code_ciqual_choisi = next(item["code_ciqual"] for item in st.session_state.panier if item["nom"] == produit_choisi)
-        
-        etapes = ["Agriculture", "Transformation", "Emballage", "Transport", "Supermarché et distribution", "Consommation"]
-        etape_selectionnee = st.radio("Choisissez une étape du cycle de vie", etapes, key="etape_produit")
 
-        # Affichage des données du produit
-        st.subheader("Données du produit")
-        result = df[df['Code CIQUAL'].astype(str) == str(code_ciqual_choisi)]
-        if not result.empty:
-            colonnes_etape = [col for col in df.columns if etape_selectionnee in col]
-            if colonnes_etape:
-                df_etape = result[colonnes_etape].T.dropna()
-                df_etape["Unité"] = [unites_indicateurs.get(col.split(" ")[0], "N/A") for col in df_etape.index]
-                st.write(df_etape)
+        ingredients_dispo = df_ingredients[df_ingredients['Ciqual  code'].astype(str) == str(code_ciqual_choisi)]['Ingredients'].dropna().unique().tolist()
+
+        if ingredients_dispo:
+            ingredient_selectionne = st.radio("Choisissez un ingrédient", ingredients_dispo, key="ingredient_produit")
+
+            impact_ingredient = df_ingredients[
+                (df_ingredients['Ciqual  code'].astype(str) == str(code_ciqual_choisi)) & 
+                (df_ingredients['Ingredients'] == ingredient_selectionne)
+            ]
+
+            if not impact_ingredient.empty:
+                colonnes_impact = impact_ingredient.columns[6:24]
+                
+                # Sécurisation de la conversion
+                impact_values = impact_ingredient[colonnes_impact].apply(pd.to_numeric, errors="coerce").fillna(0).T
+                impact_values.columns = [ingredient_selectionne]
+
+                impact_values.insert(0, "Impact environnemental", impact_values.index)
+                impact_values["Unité"] = [unites_indicateurs.get(indic, "N/A") for indic in impact_values["Impact environnemental"]]
+
+                st.dataframe(impact_values.set_index("Impact environnemental"))
+
+                fig = px.bar(
+                    x=impact_values.index,
+                    y=impact_values[ingredient_selectionne],
+                    labels={'x': 'Indicateur environnemental', 'y': 'Valeur'},
+                    title=f"Impacts environnementaux de {ingredient_selectionne}",
+                    color=impact_values[ingredient_selectionne],
+                    color_continuous_scale="RdYlGn_r"
+                )
+                st.plotly_chart(fig)
             else:
-                st.warning(f"Aucune donnée pour l'étape '{etape_selectionnee}'.")
+                st.warning(f"Aucun impact trouvé pour '{ingredient_selectionne}'.")
         else:
-            st.warning("Aucune donnée trouvée pour ce produit.")
-# Exploration des ingrédients
-st.subheader("🧑‍🍳 Ingrédients du produit sélectionné")
-
-# Vérifier si des ingrédients existent pour ce produit
-ingredients_dispo = df_ingredients[df_ingredients['Ciqual  code'].astype(str) == str(code_ciqual_choisi)]['Ingredients'].dropna().unique().tolist()
-
-if ingredients_dispo:
-    ingredient_selectionne = st.radio("Choisissez un ingrédient", ingredients_dispo, key="ingredient_produit")
-
-    impact_ingredient = df_ingredients[
-        (df_ingredients['Ciqual  code'].astype(str) == str(code_ciqual_choisi)) & 
-        (df_ingredients['Ingredients'] == ingredient_selectionne)
-    ]
-
-    if not impact_ingredient.empty:
-        colonnes_impact = impact_ingredient.columns[6:24]  # Colonnes des impacts environnementaux
-        impact_values = impact_ingredient[colonnes_impact].astype(float).T
-        impact_values.columns = [ingredient_selectionne]
-
-        # Ajout des unités
-        impact_values.insert(0, "Impact environnemental", impact_values.index)
-        impact_values["Unité"] = [unites_indicateurs.get(indic, "N/A") for indic in impact_values["Impact environnemental"]]
-
-        # Affichage du tableau
-        st.dataframe(impact_values.set_index("Impact environnemental"))
-
-        # Graphique coloré avec dégradé
-        fig = px.bar(
-            x=impact_values.index,
-            y=impact_values[ingredient_selectionne],
-            labels={'x': 'Indicateur environnemental', 'y': 'Valeur'},
-            title=f"Impacts environnementaux de {ingredient_selectionne}",
-            color=impact_values[ingredient_selectionne],
-            color_continuous_scale="RdYlGn_r"
-        )
-        st.plotly_chart(fig)
-    else:
-        st.warning(f"Aucun impact trouvé pour '{ingredient_selectionne}'.")
-else:
-    st.warning("Aucun ingrédient disponible pour ce produit.")
-
+            st.warning("Aucun ingrédient disponible pour ce produit.")
