@@ -52,7 +52,7 @@ def app():
         🌱 **Faites des choix éclairés et responsables pour une alimentation plus durable !**
         """)
 
-    st.texte_input("zone de recherches")
+    st.text_input("zone de recherches")
     st.markdown('</div>', unsafe_allow_html=True)
 
 # Lancer l'application
