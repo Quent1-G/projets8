@@ -6,39 +6,51 @@ df_synthese_finale = pd.read_csv("Synthese_finale.csv")
 
 def score_panier():
     """
-    Cette fonction calcule le score du panier en fonction des scores des produits et affiche une jauge.
+    Cette fonction calcule le score moyen du panier pour deux critères :
+    - "Score Statistique Standardisé"
+    - "Score unique EF"
+    Puis les affiche sur des jauges avec leurs vraies valeurs.
     """
     # Vérifier si le panier contient des produits
     if "panier" not in st.session_state or not st.session_state.panier:
         st.warning("Votre panier est vide.")
         return
 
-    # Déterminer les scores min et max pour l'affichage de la jauge
-    score_min = df_synthese_finale["Score Statistique Standardisé"].min()
-    score_max = df_synthese_finale["Score Statistique Standardisé"].max()
-
     # Extraire les codes CIQUAL des produits du panier
     codes_ciqual_panier = [produit["code_ciqual"] for produit in st.session_state.panier]
 
-    # Filtrer les scores des produits du panier
-    scores_panier = df_synthese_finale[df_synthese_finale["Code CIQUAL"].isin(codes_ciqual_panier)]["Score Statistique Standardisé"]
+    # --- Jauge 1 : Score Statistique Standardisé ---
+    if "Score Statistique Standardisé" in df_synthese_finale.columns:
+        score_min = df_synthese_finale["Score Statistique Standardisé"].min()
+        score_max = df_synthese_finale["Score Statistique Standardisé"].max()
 
-    # Calculer la moyenne des scores
-    if not scores_panier.empty:
-        score_moyen = scores_panier.mean()
-    else:
-        score_moyen = None
+        scores_panier = df_synthese_finale[df_synthese_finale["Code CIQUAL"].isin(codes_ciqual_panier)]["Score Statistique Standardisé"]
 
-    # Affichage de la jauge
-    st.subheader("📊 Score moyen du panier")
+        if not scores_panier.empty:
+            score_moyen = scores_panier.mean()
 
-    if score_moyen is not None:
-        st.write(f"Score moyen du panier : {score_moyen:.2f}")
+            st.subheader("📊 Score moyen du panier (Statistique Standardisé)")
+            st.write(f"Score moyen : {score_moyen:.2f} (Min: {score_min:.2f} - Max: {score_max:.2f})")
 
-        # Normaliser le score entre 0 et 1 pour la jauge
-        score_normalisé = (score_moyen - score_min) / (score_max - score_min)
+            # Affichage de la jauge avec valeur réelle
+            st.slider("Score Statistique Standardisé", min_value=score_min, max_value=score_max, value=score_moyen, disabled=True)
+        else:
+            st.warning("Aucun score trouvé pour 'Score Statistique Standardisé'.")
 
-        # Afficher une jauge
-        st.progress(score_normalisé)  # Progress prend une valeur entre 0 et 1
-    else:
-        st.warning("Aucun score trouvé pour les produits dans le panier.")
+    # --- Jauge 2 : Score unique EF ---
+    if "Score unique EF" in df_synthese_finale.columns:
+        score_ef_min = df_synthese_finale["Score unique EF"].min()
+        score_ef_max = df_synthese_finale["Score unique EF"].max()
+
+        scores_ef_panier = df_synthese_finale[df_synthese_finale["Code CIQUAL"].isin(codes_ciqual_panier)]["Score unique EF"]
+
+        if not scores_ef_panier.empty:
+            score_ef_moyen = scores_ef_panier.mean()
+
+            st.subheader("🌍 Score Environnemental (Score unique EF)")
+            st.write(f"Score EF moyen : {score_ef_moyen:.2f} (Min: {score_ef_min:.2f} - Max: {score_ef_max:.2f})")
+
+            # Affichage de la jauge avec valeur réelle
+            st.slider("Score unique EF", min_value=score_ef_min, max_value=score_ef_max, value=score_ef_moyen, disabled=True)
+        else:
+            st.warning("Aucun score trouvé pour 'Score unique EF'.")
