@@ -75,13 +75,19 @@ def variables():
     produits_synthese = produits_synthese.sort_values(by='Contribution (%)', ascending=False)
 
     # Affichage graphique de la contribution de chaque produit
-    noms_produits = [item["nom"] for item in st.session_state.panier]
-    contribution = produits_synthese['Contribution (%)']
+noms_produits = [item["nom"] for item in st.session_state.panier]
+contribution = produits_synthese['Contribution (%)']
 
-    fig = px.bar(
-        x=noms_produits,
-        y=contribution,
-        labels={'x': 'Produit', 'y': f'Contribution (%) de {selected_variable}'},
-        title=f"Contribution des produits pour {selected_variable}"
-    )
+# Créer un graphique de barres avec un gradient de couleur en fonction de la contribution
+fig = px.bar(
+    x=noms_produits,
+    y=contribution,
+    labels={'x': 'Produit', 'y': f'Contribution (%) de {selected_variable}'},
+    title=f"Contribution des produits pour {selected_variable}",
+    color=contribution,  # Applique un gradient de couleur basé sur les valeurs de contribution
+    color_continuous_scale='Viridis'  # Choisir une échelle de couleurs (tu peux changer selon ton besoin)
+)
+
+# Affichage du graphique dans Streamlit
+st.plotly_chart(fig)
     st.plotly_chart(fig)
