@@ -1,56 +1,36 @@
-import pandas as pd
-import streamlit as st
+# Ajout d'un produit
+if "ajouter_produit" not in st.session_state:
+    st.session_state.ajouter_produit = True
 
-# Charger la base de données
-@st.cache_data
-def charger_donnees():
-    return pd.read_csv("Synthese_finale.csv")
+if st.session_state.ajouter_produit:
+    search_query = st.text_input("Recherchez un produit par nom")
 
-df_synthese_finale = charger_donnees()
-
-# Titre de l'application
-st.title("🛒 Panier d'Achat - Sélection de Produits")
-
-# Saisie utilisateur - Barre de recherche
-recherche = st.text_input("🔍 Rechercher un produit :")
-
-# Initialiser le panier dans la session Streamlit
-if "panier" not in st.session_state:
-    st.session_state.panier = []
-
-# Filtrer les produits correspondant
-if recherche:
-    resultats = df_synthese_finale[df_synthese_finale["Nom du Produit en Français"].str.contains(recherche, case=False, na=False)]
-    
-    if not resultats.empty:
-        # Sélectionner un produit via un menu déroulant
-        choix = st.selectbox("📌 Sélectionnez un produit :", resultats["Nom du Produit en Français"])
+    if search_query:
+        produits_trouves = df_ingredients[df_ingredients["Nom Français"].str.contains(search_query, case=False, na=False)]
         
-        # Ajouter au panier
-        if st.button("➕ Ajouter au panier"):
-            produit_selectionne = df_synthese_finale[df_synthese_finale["Nom du Produit en Français"] == choix].iloc[0]
-            
-            # Vérifier si le produit est déjà dans le panier
-            deja_present = any(p['Nom du Produit en Français'] == choix for p in st.session_state.panier)
-            
-            if not deja_present:
-                st.session_state.panier.append(produit_selectionne.to_dict())
-                st.success(f"✅ {choix} ajouté au panier !")
-            else:
-                st.warning(f"⚠️ {choix} est déjà dans le panier.")
-    else:
-        st.write("❌ Aucun produit trouvé.")
+        if not produits_trouves.empty:
+            produit_selectionne = st.selectbox("Sélectionnez un produit", produits_trouves["Nom Français"].unique())
+
+            code_ciqual = produits_trouves[produits_trouves["Nom Français"] == produit_selectionne]["Ciqual  code"].values[0]
+            st.success(f"Produit sélectionné : {produit_selectionne} (Code CIQUAL : {code_ciqual})")
+
+            if st.button("Ajouter au panier"):
+                st.session_state.panier.append({"nom": produit_selectionne, "code_ciqual": code_ciqual})
+                st.session_state.ajouter_produit = False
+                st.rerun()
+
+if st.button("Ajouter un autre produit"):
+    st.session_state.ajouter_produit = True
+    st.rerun()
 
 # Affichage du panier
-st.subheader("🛍️ Votre Panier")
-
+st.subheader("📦 Votre panier")
 if st.session_state.panier:
-    for i, produit in enumerate(st.session_state.panier):
-        st.write(f"**{produit['Nom du Produit en Français']}** - Code Ciqual : {produit['Code CIQUAL']}")
-        
-        # Supprimer un produit du panier
-        if st.button(f"🗑️ Supprimer {produit['Nom du Produit en Français']}", key=f"suppr_{i}"):
-            st.session_state.panier.pop(i)
-            st.experimental_rerun()
+    for index, item in enumerate(st.session_state.panier):
+        col1, col2 = st.columns([4, 1])
+        col1.write(f"🔹 {item['nom']}")
+        if col2.button("❌", key=f"remove_{index}"):
+            del st.session_state.panier[index]
+            st.rerun()
 else:
-    st.write("📭 Votre panier est vide.")
+    st.info("Votre panier est vide.")
