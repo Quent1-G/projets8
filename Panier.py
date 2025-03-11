@@ -1,3 +1,10 @@
+
+
+
+# Initialiser le panier
+if "panier" not in st.session_state:
+    st.session_state.panier = []
+    
 # Ajout d'un produit
 if "ajouter_produit" not in st.session_state:
     st.session_state.ajouter_produit = True
