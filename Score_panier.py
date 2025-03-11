@@ -8,10 +8,16 @@ def score_panier():
     """
     Cette fonction calcule le score du panier en fonction des scores des produits et affiche une jauge.
     """
-    # Centrer les scores de la BDD entière
-    score_min, score_max = df_synthese_finale["Score Normalisé"].min(), df_synthese_finale["Score Normalisé"].max()
-    df_synthese_finale["Score Centré"] = 2.5 + (df_synthese_finale["Score Normalisé"] - (score_min + score_max) / 2) * 5 / (score_max - score_min)
+    # Calcul de la moyenne et de l'écart-type des scores d'origine
+    moyenne_score = df_synthese_finale["Score Normalisé"].mean()
+    std_score = df_synthese_finale["Score Normalisé"].std()
+
+    # Centrer autour de 2.5 et ajuster l'échelle pour rester entre 0 et 5
+    df_synthese_finale["Score Centré"] = 2.5 + ((df_synthese_finale["Score Normalisé"] - moyenne_score) / std_score) * 1.25
+
+    # Limiter les valeurs à l'intervalle [0, 5]
     df_synthese_finale["Score Centré"] = df_synthese_finale["Score Centré"].clip(0, 5)
+
 
     # Extraire les codes CIQUAL des produits du panier
     codes_ciqual_panier = [produit["code_ciqual"] for produit in st.session_state.panier]
