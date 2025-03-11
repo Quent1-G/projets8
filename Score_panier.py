@@ -29,7 +29,7 @@ def score_panier():
         st.warning("Aucun produit du panier trouvé dans la base.")
         return
 
-    # --- Jauge 1 : Score Statistique Standardisé ---
+    # --- Jauge 1 : Score Statistique Standardisé et Score moyen pour ces types d'aliments ---
     if "Score Statistique Standardisé" in df_synthese_finale.columns:
         score_min = df_synthese_finale["Score Statistique Standardisé"].min()
         score_max = df_synthese_finale["Score Statistique Standardisé"].max()
@@ -41,15 +41,15 @@ def score_panier():
         scores_moyens_sous_groupes = df_synthese_finale.groupby("Sous-groupe d'aliment")["Score Statistique Standardisé"].mean()
         score_moyen_sous_groupes = scores_moyens_sous_groupes[df_panier["Sous-groupe d'aliment"].unique()].mean()
 
-        st.subheader("📊 Score moyen du panier (Statistique Standardisé)")
-        st.write(f"Score moyen : {score_moyen_panier:.2f} (Min: {score_min:.2f} - Max: {score_max:.2f})")
-        st.slider("Score Statistique Standardisé", min_value=score_min, max_value=score_max, value=score_moyen_panier, disabled=True)
+        st.subheader("📊 Score moyen du panier (Statistique Standardisé) et Score moyen pour ces types d'aliments")
 
-        st.subheader("📊 Score moyen pour ces types d'aliments")
+        # Affichage sur une jauge combinée
+        st.write(f"Score moyen du panier : {score_moyen_panier:.2f} (Min: {score_min:.2f} - Max: {score_max:.2f})")
         st.write(f"Score moyen des sous-groupes : {score_moyen_sous_groupes:.2f}")
-        st.slider("Score Statistique Standardisé - Sous-groupes", min_value=score_min, max_value=score_max, value=score_moyen_sous_groupes, disabled=True)
+        st.progress((score_moyen_panier - score_min) / (score_max - score_min))  # Jauge pour le panier
+        st.progress((score_moyen_sous_groupes - score_min) / (score_max - score_min))  # Jauge pour les sous-groupes
 
-    # --- Jauge 2 : Score unique EF ---
+    # --- Jauge 2 : Score unique EF et Score moyen pour ces types d'aliments ---
     if "Score unique EF" in df_synthese_finale.columns:
         score_ef_min = df_synthese_finale["Score unique EF"].min()
         score_ef_max = df_synthese_finale["Score unique EF"].max()
@@ -61,10 +61,10 @@ def score_panier():
         scores_ef_moyens_sous_groupes = df_synthese_finale.groupby("Sous-groupe d'aliment")["Score unique EF"].mean()
         score_ef_moyen_sous_groupes = scores_ef_moyens_sous_groupes[df_panier["Sous-groupe d'aliment"].unique()].mean()
 
-        st.subheader("🌍 Score Environnemental (Score unique EF)")
-        st.write(f"Score EF moyen : {score_ef_moyen_panier:.2f} (Min: {score_ef_min:.2f} - Max: {score_ef_max:.2f})")
-        st.slider("Score unique EF", min_value=score_ef_min, max_value=score_ef_max, value=score_ef_moyen_panier, disabled=True)
+        st.subheader("🌍 Score Environnemental (Score unique EF) et Score moyen pour ces types d'aliments")
 
-        st.subheader("🌍 Score moyen pour ces types d'aliments")
+        # Affichage sur une jauge combinée
+        st.write(f"Score EF moyen : {score_ef_moyen_panier:.2f} (Min: {score_ef_min:.2f} - Max: {score_ef_max:.2f})")
         st.write(f"Score EF moyen des sous-groupes : {score_ef_moyen_sous_groupes:.2f}")
-        st.slider("Score unique EF - Sous-groupes", min_value=score_ef_min, max_value=score_ef_max, value=score_ef_moyen_sous_groupes, disabled=True)
+        st.progress((score_ef_moyen_panier - score_ef_min) / (score_ef_max - score_ef_min))  # Jauge pour le panier EF
+        st.progress((score_ef_moyen_sous_groupes - score_ef_min) / (score_ef_max - score_ef_min))  # Jauge pour les sous-groupes EF
