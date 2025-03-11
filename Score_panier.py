@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import plotly.graph_objects as go
 
 # Charger la base de données
 df_synthese_finale = pd.read_csv("Synthese_finale.csv")
@@ -9,7 +10,7 @@ def score_panier():
     Cette fonction calcule :
     1. Le score moyen du panier en fonction des produits sélectionnés.
     2. Le score moyen des sous-groupes d'aliments correspondants.
-    Puis les affiche sur des jauges combinées pour :
+    Puis les affiche sur une jauge avec 2 points légendés pour :
     - "Score Statistique Standardisé"
     - "Score unique EF"
     """
@@ -43,13 +44,26 @@ def score_panier():
 
         st.subheader("📊 Score Statistique Standardisé et Score moyen pour ces types d'aliments")
 
-        # Affichage des deux scores sur la même jauge
-        st.write(f"Score moyen du panier : {score_moyen_panier:.2f} (Min: {score_min:.2f} - Max: {score_max:.2f})")
-        st.write(f"Score moyen des sous-groupes : {score_moyen_sous_groupes:.2f}")
+        # Création de la jauge avec Plotly
+        fig = go.Figure(go.Indicator(
+            mode="gauge+number+delta",
+            value=score_moyen_panier,
+            delta={'reference': score_moyen_sous_groupes},
+            gauge={
+                'axis': {'range': [score_min, score_max]},
+                'steps': [
+                    {'range': [score_min, score_max], 'color': "lightgray"}
+                ],
+                'bar': {'color': "blue"},
+            },
+            title={'text': "Score Statistique Standardisé"},
+            annotations=[
+                {"x": 0.25, "y": 0.8, "text": f"Panier: {score_moyen_panier:.2f}", "showarrow": True, "arrowhead": 4},
+                {"x": 0.75, "y": 0.8, "text": f"Sous-groupes: {score_moyen_sous_groupes:.2f}", "showarrow": True, "arrowhead": 4}
+            ]
+        ))
 
-        # Affichage des scores combinés sur une seule jauge
-        st.progress((score_moyen_panier - score_min) / (score_max - score_min))  # Jauge pour le panier
-        st.progress((score_moyen_sous_groupes - score_min) / (score_max - score_min))  # Jauge pour les sous-groupes
+        st.plotly_chart(fig)
 
     # --- Jauge combinée pour "Score unique EF" et "Score moyen pour ces types d'aliments" ---
     if "Score unique EF" in df_synthese_finale.columns:
@@ -65,10 +79,23 @@ def score_panier():
 
         st.subheader("🌍 Score Environnemental (Score unique EF) et Score moyen pour ces types d'aliments")
 
-        # Affichage des deux scores sur la même jauge
-        st.write(f"Score EF moyen : {score_ef_moyen_panier:.2f} (Min: {score_ef_min:.2f} - Max: {score_ef_max:.2f})")
-        st.write(f"Score EF moyen des sous-groupes : {score_ef_moyen_sous_groupes:.2f}")
+        # Création de la jauge avec Plotly
+        fig = go.Figure(go.Indicator(
+            mode="gauge+number+delta",
+            value=score_ef_moyen_panier,
+            delta={'reference': score_ef_moyen_sous_groupes},
+            gauge={
+                'axis': {'range': [score_ef_min, score_ef_max]},
+                'steps': [
+                    {'range': [score_ef_min, score_ef_max], 'color': "lightgray"}
+                ],
+                'bar': {'color': "green"},
+            },
+            title={'text': "Score Environnemental"},
+            annotations=[
+                {"x": 0.25, "y": 0.8, "text": f"Panier: {score_ef_moyen_panier:.2f}", "showarrow": True, "arrowhead": 4},
+                {"x": 0.75, "y": 0.8, "text": f"Sous-groupes: {score_ef_moyen_sous_groupes:.2f}", "showarrow": True, "arrowhead": 4}
+            ]
+        ))
 
-        # Affichage des scores combinés sur une seule jauge
-        st.progress((score_ef_moyen_panier - score_ef_min) / (score_ef_max - score_ef_min))  # Jauge pour le panier EF
-        st.progress((score_ef_moyen_sous_groupes - score_ef_min) / (score_ef_max - score_ef_min))  # Jauge pour les sous-groupes EF
+        st.plotly_chart(fig)
