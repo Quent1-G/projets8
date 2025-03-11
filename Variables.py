@@ -76,8 +76,9 @@ def variables():
     somme_variable = produits_synthese[selected_variable].sum()
 
     # Afficher la somme des valeurs pour la variable environnementale sélectionnée avec l'unité
+    # Affichage avec 10 décimales
     if somme_variable > 0:
-        st.metric(label=f"Somme des {selected_variable}", value=f"{somme_variable:.2f} {unites_variables[selected_variable]}")
+        st.metric(label=f"Somme des {selected_variable}", value=f"{somme_variable:.10f} {unites_variables[selected_variable]}")
     else:
         st.warning(f"La somme des {selected_variable} est égale à 0. Cela peut être dû à des données manquantes ou incorrectes.")
 
