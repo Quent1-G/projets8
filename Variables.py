@@ -74,14 +74,15 @@ def variables():
     # Trier les produits par contribution décroissante
     produits_synthese = produits_synthese.sort_values(by='Contribution (%)', ascending=False)
 
-    # Affichage graphique de la contribution de chaque produit
-    noms_produits = [item["nom"] for item in st.session_state.panier]
-    contribution = produits_synthese['Contribution (%)']
-
+    # Créer un histogramme avec un gradient de couleurs
     fig = px.bar(
-        x=noms_produits,
-        y=contribution,
-        labels={'x': 'Produit', 'y': f'Contribution (%) de {selected_variable}'},
-        title=f"Contribution des produits pour {selected_variable}"
+        produits_synthese, 
+        x="Code CIQUAL", 
+        y=selected_variable, 
+        title=f"Impact des Produits du Panier pour {selected_variable}",
+        color=selected_variable,  # Appliquer une couleur en fonction des valeurs de la variable sélectionnée
+        color_continuous_scale='Viridis'  # Choisir le gradient de couleurs
     )
+
+    # Afficher l'histogramme avec le gradient de couleur
     st.plotly_chart(fig)
