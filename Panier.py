@@ -43,7 +43,7 @@ def gerer_panier():
     if st.session_state.panier:
         for index, item in enumerate(st.session_state.panier):
             col1, col2 = st.columns([4, 1])
-            col1.write(f"🔹 **{item['nom']}")
+            col1.write(f"🔹 **{item['nom']}**")
 
             # Bouton pour supprimer un produit
             if col2.button("❌", key=f"remove_{index}"):
