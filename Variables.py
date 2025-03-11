@@ -59,29 +59,43 @@ def variables():
         st.warning("Aucun produit correspondant aux codes CIQUAL dans le panier.")
         return
 
-    # Convertir les valeurs de la colonne sélectionnée en float pour éviter des erreurs de type
-    produits_synthese[selected_variable] = produits_synthese[selected_variable].astype(float)
+    # Vérifier si la variable environnementale a des valeurs manquantes
+    if selected_variable not in produits_synthese.columns:
+        st.warning(f"La variable environnementale {selected_variable} n'existe pas dans la base de données.")
+        return
+
+    # Convertir les valeurs de la colonne sélectionnée en float
+    produits_synthese[selected_variable] = pd.to_numeric(produits_synthese[selected_variable], errors='coerce')
+
+    # Vérifier si la conversion a bien fonctionné
+    if produits_synthese[selected_variable].isnull().all():
+        st.warning(f"Aucune valeur valide trouvée pour {selected_variable}.")
+        return
 
     # Calculer la somme des valeurs pour la variable sélectionnée dans le panier
     somme_variable = produits_synthese[selected_variable].sum()
 
     # Afficher la somme des valeurs pour la variable environnementale sélectionnée avec l'unité
-    st.metric(label=f"Somme des {selected_variable}", value=f"{somme_variable:.2f} {unites_variables[selected_variable]}")
+    if somme_variable > 0:
+        st.metric(label=f"Somme des {selected_variable}", value=f"{somme_variable:.2f} {unites_variables[selected_variable]}")
+    else:
+        st.warning(f"La somme des {selected_variable} est égale à 0. Cela peut être dû à des données manquantes ou incorrectes.")
 
     # Calcul de la contribution de chaque produit à la somme totale
-    produits_synthese['Contribution (%)'] = (produits_synthese[selected_variable] / somme_variable) * 100
+    if somme_variable > 0:
+        produits_synthese['Contribution (%)'] = (produits_synthese[selected_variable] / somme_variable) * 100
 
-    # Trier les produits par contribution décroissante
-    produits_synthese = produits_synthese.sort_values(by='Contribution (%)', ascending=False)
+        # Trier les produits par contribution décroissante
+        produits_synthese = produits_synthese.sort_values(by='Contribution (%)', ascending=False)
 
-    # Affichage graphique de la contribution de chaque produit
-    noms_produits = [item["nom"] for item in st.session_state.panier]
-    contribution = produits_synthese['Contribution (%)']
+        # Affichage graphique de la contribution de chaque produit
+        noms_produits = [item["nom"] for item in st.session_state.panier]
+        contribution = produits_synthese['Contribution (%)']
 
-    fig = px.bar(
-        x=noms_produits,
-        y=contribution,
-        labels={'x': 'Produit', 'y': f'Contribution (%) de {selected_variable}'},
-        title=f"Contribution des produits pour {selected_variable}"
-    )
-    st.plotly_chart(fig)
+        fig = px.bar(
+            x=noms_produits,
+            y=contribution,
+            labels={'x': 'Produit', 'y': f'Contribution (%) de {selected_variable}'},
+            title=f"Contribution des produits pour {selected_variable}"
+        )
+        st.plotly_chart(fig)
