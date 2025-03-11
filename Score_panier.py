@@ -46,9 +46,8 @@ def score_panier():
 
         # Création de la jauge avec Plotly
         fig = go.Figure(go.Indicator(
-            mode="gauge+number+delta",
+            mode="gauge+number",
             value=score_moyen_panier,
-            delta={'reference': score_moyen_sous_groupes},
             gauge={
                 'axis': {'range': [score_min, score_max]},
                 'steps': [
@@ -57,6 +56,7 @@ def score_panier():
                 'bar': {'color': "blue"},
             },
             title={'text': "Score Statistique Standardisé"},
+            # Ajouter les annotations avec les deux points légendés
             annotations=[
                 {"x": 0.25, "y": 0.8, "text": f"Panier: {score_moyen_panier:.2f}", "showarrow": True, "arrowhead": 4},
                 {"x": 0.75, "y": 0.8, "text": f"Sous-groupes: {score_moyen_sous_groupes:.2f}", "showarrow": True, "arrowhead": 4}
@@ -81,9 +81,8 @@ def score_panier():
 
         # Création de la jauge avec Plotly
         fig = go.Figure(go.Indicator(
-            mode="gauge+number+delta",
+            mode="gauge+number",
             value=score_ef_moyen_panier,
-            delta={'reference': score_ef_moyen_sous_groupes},
             gauge={
                 'axis': {'range': [score_ef_min, score_ef_max]},
                 'steps': [
@@ -92,6 +91,7 @@ def score_panier():
                 'bar': {'color': "green"},
             },
             title={'text': "Score Environnemental"},
+            # Ajouter les annotations avec les deux points légendés
             annotations=[
                 {"x": 0.25, "y": 0.8, "text": f"Panier: {score_ef_moyen_panier:.2f}", "showarrow": True, "arrowhead": 4},
                 {"x": 0.75, "y": 0.8, "text": f"Sous-groupes: {score_ef_moyen_sous_groupes:.2f}", "showarrow": True, "arrowhead": 4}
