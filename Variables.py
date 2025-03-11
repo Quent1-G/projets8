@@ -4,25 +4,25 @@ import plotly.express as px
 
 # Dictionnaire des unités correspondantes à chaque variable environnementale
 unites_variables = {
-    'Changement climatique': 'kg CO2 eq/kg',
-    'Appauvrissement de la couche d\'ozone': 'kg CVC11 eq/kg',
-    'Rayonnements ionisants': 'kBq U-235 eq/kg',
-    'Formation photochimique d\'ozone': 'kg NMVOC eq/kg',
-    'Particules fines': 'disease inc./kg',
-    'Effets toxicologiques sur la santé humaine : substances non-cancérogènes': 'kg Sb eq/kg',
-    'Effets toxicologiques sur la santé humaine : substances cancérogènes': 'kg Sb eq/kg',
-    'Acidification terrestre et eaux douces': 'mol H+ eq/kg',
-    'Eutrophisation eaux douces': 'kg P eq/kg',
-    'Eutrophisation marine': 'kg N eq/kg',
-    'Eutrophisation terrestre': 'mol N eq/kg',
-    'Écotoxicité pour écosystèmes aquatiques d\'eau douce': 'CTUe/kg',
-    'Utilisation du sol': 'Pt/kg',
-    'Épuisement des ressources eau': 'm3 depriv./kg',
-    'Épuisement des ressources énergétiques': 'MJ/kg',
-    'Épuisement des ressources minéraux': 'kg Sb eq/kg',
-    'Changement climatique - émissions biogéniques': 'kg CO2 eq/kg',
-    'Changement climatique - émissions fossiles': 'kg CO2 eq/kg',
-    'Changement climatique - émissions liées au changement d\'affectation des sols': 'kg CO2 eq/kg'
+    'Changement climatique': 'kg CO2 eq/kg de produit',
+    'Appauvrissement de la couche d\'ozone': 'kg CVC11 eq/kg de produit',
+    'Rayonnements ionisants': 'kBq U-235 eq/kg de produit',
+    'Formation photochimique d\'ozone': 'kg NMVOC eq/kg de produit',
+    'Particules fines': 'disease inc./kg de produit',
+    'Effets toxicologiques sur la santé humaine : substances non-cancérogènes': 'kg Sb eq/kg de produit',
+    'Effets toxicologiques sur la santé humaine : substances cancérogènes': 'kg Sb eq/kg de produit',
+    'Acidification terrestre et eaux douces': 'mol H+ eq/kg de produit',
+    'Eutrophisation eaux douces': 'kg P eq/kg de produit',
+    'Eutrophisation marine': 'kg N eq/kg de produit',
+    'Eutrophisation terrestre': 'mol N eq/kg de produit',
+    'Écotoxicité pour écosystèmes aquatiques d\'eau douce': 'CTUe/kg de produit',
+    'Utilisation du sol': 'Pt/kg de produit',
+    'Épuisement des ressources eau': 'm3 depriv./kg de produit',
+    'Épuisement des ressources énergétiques': 'MJ/kg de produit',
+    'Épuisement des ressources minéraux': 'kg Sb eq/kg de produit',
+    'Changement climatique - émissions biogéniques': 'kg CO2 eq/kg de produit',
+    'Changement climatique - émissions fossiles': 'kg CO2 eq/kg de produit',
+    'Changement climatique - émissions liées au changement d\'affectation des sols': 'kg CO2 eq/kg de produit'
 }
 
 # Fonction principale pour gérer et afficher les variables environnementales
@@ -75,10 +75,6 @@ def variables():
     produits_synthese = produits_synthese.sort_values(by='Contribution (%)', ascending=False)
 
     # Affichage graphique de la contribution de chaque produit
-noms_produits = [item["nom"] for item in st.session_state.panier]
-contribution = produits_synthese['Contribution (%)']
-
- # Affichage graphique de la contribution de chaque produit
     noms_produits = [item["nom"] for item in st.session_state.panier]
     contribution = produits_synthese['Contribution (%)']
 
