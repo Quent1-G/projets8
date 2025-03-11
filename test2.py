@@ -1,7 +1,5 @@
-Panier.py
+import streamlit as st
+from Panier import gerer_panier
 
-# Créer une liste des codes CIQUAL
-codes_ciqual = [produit["code_ciqual"] for produit in st.session_state.panier]
-
-# Afficher la liste des codes CIQUAL
-st.write("Liste des codes CIQUAL dans le panier :", codes_ciqual)
+# Appeler la fonction qui gère tout le panier
+gerer_panier()
