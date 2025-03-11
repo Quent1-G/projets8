@@ -1,59 +1,70 @@
-import matplotlib.pyplot as plt
-import numpy as np
+import streamlit as st
+import pandas as pd
 
-# --- Jauge 1 : Score Statistique Standardisé ---
-if "Score Statistique Standardisé" in df_synthese_finale.columns:
-    score_min = df_synthese_finale["Score Statistique Standardisé"].min()
-    score_max = df_synthese_finale["Score Statistique Standardisé"].max()
+# Charger la base de données
+df_synthese_finale = pd.read_csv("Synthese_finale.csv")
 
-    # Calcul du score moyen du panier
-    score_moyen_panier = df_panier["Score Statistique Standardisé"].mean()
+def score_panier():
+    """
+    Cette fonction calcule :
+    1. Le score moyen du panier en fonction des produits sélectionnés.
+    2. Le score moyen des sous-groupes d'aliments correspondants.
+    Puis les affiche sur des jauges pour :
+    - "Score Statistique Standardisé"
+    - "Score unique EF"
+    """
 
-    # Calcul du score moyen des sous-groupes d'aliments
-    scores_moyens_sous_groupes = df_synthese_finale.groupby("Sous-groupe d'aliment")["Score Statistique Standardisé"].mean()
-    score_moyen_sous_groupes = scores_moyens_sous_groupes[df_panier["Sous-groupe d'aliment"].unique()].mean()
+    # Vérifier si le panier contient des produits
+    if "panier" not in st.session_state or not st.session_state.panier:
+        st.warning("Votre panier est vide.")
+        return
 
-    st.subheader("📊 Score moyen du panier (Statistique Standardisé)")
-    st.write(f"Score moyen : {score_moyen_panier:.2f} (Min: {score_min:.2f} - Max: {score_max:.2f})")
-    
-    # Jauge avec les deux scores
-    st.slider("Score Statistique Standardisé", min_value=score_min, max_value=score_max, value=score_moyen_panier, disabled=True)
+    # Extraire les codes CIQUAL des produits du panier
+    codes_ciqual_panier = [produit["code_ciqual"] for produit in st.session_state.panier]
 
-    st.subheader("📊 Score moyen pour ces types d'aliments")
-    st.write(f"Score moyen des sous-groupes : {score_moyen_sous_groupes:.2f}")
-    
-    # Jauge avec les deux scores
-    st.slider("Score Statistique Standardisé - Sous-groupes", min_value=score_min, max_value=score_max, value=score_moyen_sous_groupes, disabled=True)
+    # Filtrer la base pour ne garder que les produits du panier
+    df_panier = df_synthese_finale[df_synthese_finale["Code CIQUAL"].isin(codes_ciqual_panier)]
 
-    # Affichage sur la même jauge
-    st.subheader("📊 Visualisation des scores sur la même jauge")
+    if df_panier.empty:
+        st.warning("Aucun produit du panier trouvé dans la base.")
+        return
 
-    # Créer un graphique avec les deux points
-    fig, ax = plt.subplots(figsize=(6, 1))
-    ax.set_xlim(score_min, score_max)
-    ax.set_ylim(0, 1)
-    ax.set_yticks([])  # Ne pas afficher l'axe y
-    ax.plot([score_moyen_panier, score_moyen_sous_groupes], [0.5, 0.5], marker='o', color='red', markersize=10)
-    ax.annotate(f'{score_moyen_panier:.2f}', (score_moyen_panier, 0.5), textcoords="offset points", xytext=(0, 10), ha='center', color='red')
-    ax.annotate(f'{score_moyen_sous_groupes:.2f}', (score_moyen_sous_groupes, 0.5), textcoords="offset points", xytext=(0, 10), ha='center', color='red')
-    
-    # Afficher le graphique
-    st.pyplot(fig)
+    # --- Jauge 1 : Score Statistique Standardisé ---
+    if "Score Statistique Standardisé" in df_synthese_finale.columns:
+        score_min = df_synthese_finale["Score Statistique Standardisé"].min()
+        score_max = df_synthese_finale["Score Statistique Standardisé"].max()
+
+        # Calcul du score moyen du panier
+        score_moyen_panier = df_panier["Score Statistique Standardisé"].mean()
+
+        # Calcul du score moyen des sous-groupes d'aliments
+        scores_moyens_sous_groupes = df_synthese_finale.groupby("Sous-groupe d'aliment")["Score Statistique Standardisé"].mean()
+        score_moyen_sous_groupes = scores_moyens_sous_groupes[df_panier["Sous-groupe d'aliment"].unique()].mean()
+
+        st.subheader("📊 Score moyen du panier (Statistique Standardisé)")
+        st.write(f"Score moyen : {score_moyen_panier:.2f} (Min: {score_min:.2f} - Max: {score_max:.2f})")
+        st.slider("Score Statistique Standardisé", min_value=score_min, max_value=score_max, value=score_moyen_panier, disabled=True)
+
+        st.subheader("📊 Score moyen pour ces types d'aliments")
+        st.write(f"Score moyen des sous-groupes : {score_moyen_sous_groupes:.2f}")
+        st.slider("Score Statistique Standardisé - Sous-groupes", min_value=score_min, max_value=score_max, value=score_moyen_sous_groupes, disabled=True)
 
     # --- Jauge 2 : Score unique EF ---
     if "Score unique EF" in df_synthese_finale.columns:
         score_ef_min = df_synthese_finale["Score unique EF"].min()
         score_ef_max = df_synthese_finale["Score unique EF"].max()
 
-        scores_ef_panier = df_synthese_finale[df_synthese_finale["Code CIQUAL"].isin(codes_ciqual_panier)]["Score unique EF"]
+        # Calcul du score EF moyen du panier
+        score_ef_moyen_panier = df_panier["Score unique EF"].mean()
 
-        if not scores_ef_panier.empty:
-            score_ef_moyen = scores_ef_panier.mean()
+        # Calcul du score EF moyen des sous-groupes d'aliments
+        scores_ef_moyens_sous_groupes = df_synthese_finale.groupby("Sous-groupe d'aliment")["Score unique EF"].mean()
+        score_ef_moyen_sous_groupes = scores_ef_moyens_sous_groupes[df_panier["Sous-groupe d'aliment"].unique()].mean()
 
-            st.subheader("🌍 Score Environnemental (Score unique EF)")
-            st.write(f"Score EF moyen : {score_ef_moyen:.2f} (Min: {score_ef_min:.2f} - Max: {score_ef_max:.2f})")
+        st.subheader("🌍 Score Environnemental (Score unique EF)")
+        st.write(f"Score EF moyen : {score_ef_moyen_panier:.2f} (Min: {score_ef_min:.2f} - Max: {score_ef_max:.2f})")
+        st.slider("Score unique EF", min_value=score_ef_min, max_value=score_ef_max, value=score_ef_moyen_panier, disabled=True)
 
-            # Affichage de la jauge avec valeur réelle
-            st.slider("Score unique EF", min_value=score_ef_min, max_value=score_ef_max, value=score_ef_moyen, disabled=True)
-        else:
-            st.warning("Aucun score trouvé pour 'Score unique EF'.")
+        st.subheader("🌍 Score moyen pour ces types d'aliments")
+        st.write(f"Score EF moyen des sous-groupes : {score_ef_moyen_sous_groupes:.2f}")
+        st.slider("Score unique EF - Sous-groupes", min_value=score_ef_min, max_value=score_ef_max, value=score_ef_moyen_sous_groupes, disabled=True)
