@@ -36,7 +36,7 @@ def etapes_panier():
     somme_valeurs_panier = df_panier[colonnes_var_env].sum()
 
     # Calcul des moyennes des catégories et somme de ces moyennes
-    moyennes_categories = df_agribalyse.groupby("categorie")[colonnes_var_env].mean()
+    moyennes_categories = df_agribalyse.groupby("Sous-groupe d'aliment")[colonnes_var_env].mean()
     somme_moyennes_categories = moyennes_categories.loc[df_panier["categorie"].unique()].sum()
 
     # Création du DataFrame pour affichage
