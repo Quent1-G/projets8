@@ -22,7 +22,8 @@ def etapes_panier():
     codes_ciqual_panier = [int(produit["code_ciqual"]) for produit in st.session_state.panier]
 
     # Filtrer la base Agribalyse pour ne garder que les produits du panier
-    df_panier = df_agribalyse[df_agribalyse["code_ciqual"].isin(codes_ciqual_panier)]
+    df_panier = df_agribalyse[df_agribalyse["Code CIQUAL"].isin(codes_ciqual_panier)]
+
 
     if df_panier.empty:
         st.warning("Aucun produit du panier trouvé dans la base Agribalyse.")
