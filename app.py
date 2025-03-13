@@ -2,7 +2,7 @@ import streamlit as st
 from Panier import gerer_panier
 from Score_panier import score_panier
 from Variables import variables
-from etapes_panier import etapes_panier
+
 
 # Appeler la fonction qui gère tout le panier
 gerer_panier()
@@ -17,5 +17,3 @@ score_panier()
 # Appeler la fonction pour afficher les variables environnementales
 variables()
 
-# Appeler la fonction pour afficher les étapes du panier
-etapes_panier()
