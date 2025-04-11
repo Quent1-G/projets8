@@ -72,9 +72,7 @@ def score_panier():
 
     # --- Jauge 3 : Note panier et note moyenne pour ces types d'aliments ---
     if "note_y" in df_synthese_finale.columns:
-        note_min = df_synthese_finale["note_y"].min()
-        note_max = df_synthese_finale["note_y"].max()
-
+   
         # Calcul du score moyen du panier
         note_moyen_panier = df_panier["note_y"].mean()
 
@@ -86,10 +84,10 @@ def score_panier():
 
         col1, col2 = st.columns(2)
         with col1:
-            st.write(f"Note moyenne du panier : {note_moyen_panier:.2f} (Min: {note_min:.2f} - Max: {note_max:.2f})")
-            st.progress((note_moyen_panier - note_min) / (note_max - note_min))
+            st.write(f"Note moyenne du panier : {note_moyen_panier:.2f}")
+        
         with col2:
             st.write(f"Note moyenne des sous-groupes : {note_moyen_sous_groupes:.2f}")
-            st.progress((note_moyen_sous_groupes - note_min) / (note_max - note_min))
+        
         
 
