@@ -70,3 +70,25 @@ def score_panier():
         st.progress((score_ef_moyen_sous_groupes - score_ef_min) / (score_ef_max - score_ef_min))  # Jauge pour les sous-groupes EF
 
 
+    # --- Jauge 3 : Note panier et note moyenne pour ces types d'aliments ---
+    if "note_y" in df_synthese_finale.columns:
+        score_ef_min = df_synthese_finale["note_y"].min()
+        score_ef_max = df_synthese_finale["note_y"].max()
+
+        # Calcul du score EF moyen du panier
+        note_moyen_panier = df_panier["note_y"].mean()
+
+        # Calcul du score EF moyen des sous-groupes d'aliments
+        note_moyens_sous_groupes = df_synthese_finale.groupby("Sous-groupe d'aliment")["note_y"].mean()
+        note_moyen_sous_groupes = scores_ef_moyens_sous_groupes[df_panier["Sous-groupe d'aliment"].unique()].mean()
+
+        st.subheader("Note moyenne panier)
+
+        # Affichage sur une jauge combinée
+        st.write(f"Note moyenne du panier : {note_moyen_panier:.2f} (Min: {score_ef_min:.2f} - Max: {score_ef_max:.2f})")
+        st.write(f"Note moyenne sous groupe : {note_moyens_sous_groupes:.2f}")
+        st.progress((score_ef_moyen_panier - score_ef_min) / (score_ef_max - score_ef_min))  # Jauge pour le panier EF
+        st.progress((note_moyens_sous_groupes - score_ef_min) / (score_ef_max - score_ef_min))  # Jauge pour les sous-groupes EF
+
+        
+
