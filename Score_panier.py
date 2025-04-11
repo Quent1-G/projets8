@@ -68,3 +68,6 @@ def score_panier():
         st.write(f"Score EF moyen des sous-groupes : {score_ef_moyen_sous_groupes:.2f}")
         st.progress((score_ef_moyen_panier - score_ef_min) / (score_ef_max - score_ef_min))  # Jauge pour le panier EF
         st.progress((score_ef_moyen_sous_groupes - score_ef_min) / (score_ef_max - score_ef_min))  # Jauge pour les sous-groupes EF
+
+    st.subheader("Note /10")
+       st.write(df_synthese_finale["note_y"])
