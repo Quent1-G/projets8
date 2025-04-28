@@ -87,8 +87,10 @@ def score_panier():
         st.subheader("📊 Score moyen du panier (Statistique Standardisé) et Score moyen pour ces types d'aliments")
 
         # Affichage sur une jauge combinée
-        st.write(f"Score moyen du panier : {score_moyen_panier:.2f} -> Classe {classe_panier:.2f}(Min: {score_min:.2f} - Max: {score_max:.2f})")
-        st.write(f"Score moyen des sous-groupes : {score_moyen_sous_groupes:.2f} -> Classe {classe_panier:.2f}")
+        st.write(f"Score moyen du panier : {score_moyen_panier:.2f} (Min: {score_min:.2f} - Max: {score_max:.2f})")
+        st.write(f"Classe -> -> {classe_panier:.2f}")
+        st.write(f"Score moyen des sous-groupes : {score_moyen_sous_groupes:.2f}")
+        st.write(f"Classe -> -> {classe_moyenne:.2f}")
         st.progress((score_moyen_panier - score_min) / (score_max - score_min))  # Jauge pour le panier
         st.progress((score_moyen_sous_groupes - score_min) / (score_max - score_min))  # Jauge pour les sous-groupes
 
