@@ -38,16 +38,57 @@ def score_panier():
 
         # Calcul du score moyen des sous-groupes d'aliments
         scores_moyens_sous_groupes = df_synthese_finale.groupby("Sous-groupe d'aliment")["Score Statistique Standardisé"].mean()
-        ###### affichage Lettre pour le score
         
+        if scores_moyens_sous_groupes < -0.4:
+                classe = "A+"
+        elif scores_moyens_sous_groupes < -0.2:
+                classe = "A-"
+        elif scores_moyens_sous_groupes < 0.05:
+                classe = "B+"
+        elif scores_moyens_sous_groupes < 0.45:
+                classe = "B-"
+        elif scores_moyens_sous_groupes < 1:
+                classe = "C+"
+        elif scores_moyens_sous_groupes < 2:
+                classe = "C-" 
+        elif scores_moyens_sous_groupes < 3.4:
+                classe = "D+"
+        elif scores_moyens_sous_groupes < 5:
+                classe = "D-"
+        elif scores_moyens_sous_groupes < 6:
+                classe = "E+"
+        else :
+                classe = "E-"   
+        classe_panier = classe
         score_moyen_sous_groupes = scores_moyens_sous_groupes[df_panier["Sous-groupe d'aliment"].unique()].mean()
-        ###### affichage Lettre pour le score
+       
+        if scores_moyens_sous_groupes < -0.4:
+                classe = "A+"
+        elif scores_moyens_sous_groupes < -0.2:
+                classe = "A-"
+        elif scores_moyens_sous_groupes < 0.05:
+                classe = "B+"
+        elif scores_moyens_sous_groupes < 0.45:
+                classe = "B-"
+        elif scores_moyens_sous_groupes < 1:
+                classe = "C+"
+        elif scores_moyens_sous_groupes < 2:
+                classe = "C-" 
+        elif scores_moyens_sous_groupes < 3.4:
+                classe = "D+"
+        elif scores_moyens_sous_groupes < 5:
+                classe = "D-"
+        elif scores_moyens_sous_groupes < 6:
+                classe = "E+"
+        else :
+                classe = "E-"  
+        classe_moyenne = classe
         
         st.subheader("📊 Score moyen du panier (Statistique Standardisé) et Score moyen pour ces types d'aliments")
 
         # Affichage sur une jauge combinée
-        st.write(f"Score moyen du panier : {score_moyen_panier:.2f} (Min: {score_min:.2f} - Max: {score_max:.2f})")
-        st.write(f"Score moyen des sous-groupes : {score_moyen_sous_groupes:.2f} -> Classe ")
+        st.write(f"Score moyen du panier : {score_moyen_panier:.2f} -> Classe {classe_panier:.2f}(Min: {score_min:.2f} - Max: {score_max:.2f})")
+        st.write(f"Score moyen des sous-groupes : {score_moyen_sous_groupes:.2f} -> Classe {classe_panier:.2f}")
         st.progress((score_moyen_panier - score_min) / (score_max - score_min))  # Jauge pour le panier
         st.progress((score_moyen_sous_groupes - score_min) / (score_max - score_min))  # Jauge pour les sous-groupes
 
