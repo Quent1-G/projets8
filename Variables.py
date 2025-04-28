@@ -85,7 +85,7 @@ def variables():
 
 
 
-    # Calcul de la contribution de chaque produit à la somme totale
+        # Calcul de la contribution de chaque produit à la somme totale
     if somme_variable > 0:
         produits_synthese['Contribution (%)'] = (produits_synthese[selected_variable] / somme_variable) * 100
 
@@ -93,7 +93,7 @@ def variables():
         produits_synthese = produits_synthese.sort_values(by='Contribution (%)', ascending=False)
 
         # Affichage graphique de la contribution de chaque produit
-        noms_produits = produits_synthese['nom']  # <<< récupérer les bons noms ici !
+        noms_produits = [item["nom"] for item in st.session_state.panier]
         contribution = produits_synthese['Contribution (%)']
 
         fig = px.bar(
