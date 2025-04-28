@@ -80,7 +80,10 @@ def variables():
     if somme_variable > 0:
         st.metric(label=f"Somme des {selected_variable}", value=f"{somme_variable:.10f} {unites_variables[selected_variable]}")
     else:
-        st.warning(f"La somme des {selected_variable} est égale à 0. Cela peut être dû à des données manquantes ou incorrectes.")
+        st.warning(f"Le résultat des {selected_variable} est inférieure ou égale à 0. Cela peut être dû à des données manquantes ou incorrectes.")
+
+
+
 
     # Calcul de la contribution de chaque produit à la somme totale
     if somme_variable > 0:
@@ -90,7 +93,7 @@ def variables():
         produits_synthese = produits_synthese.sort_values(by='Contribution (%)', ascending=False)
 
         # Affichage graphique de la contribution de chaque produit
-        noms_produits = [item["nom"] for item in st.session_state.panier]
+        noms_produits = produits_synthese['nom']  # <<< récupérer les bons noms ici !
         contribution = produits_synthese['Contribution (%)']
 
         fig = px.bar(
@@ -100,3 +103,4 @@ def variables():
             title=f"Contribution des produits pour {selected_variable}"
         )
         st.plotly_chart(fig)
+
