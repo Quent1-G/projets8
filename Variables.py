@@ -89,8 +89,7 @@ def variables():
     if somme_variable > 0:
         produits_synthese['Contribution (%)'] = (produits_synthese[selected_variable] / somme_variable) * 100
 
-        # Trier les produits par contribution décroissante
-        produits_synthese = produits_synthese.sort_values(by='Contribution (%)', ascending=False)
+
 
         # Affichage graphique de la contribution de chaque produit
         noms_produits = [item["nom"] for item in st.session_state.panier]
