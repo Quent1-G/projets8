@@ -36,7 +36,7 @@ def variables():
 
     # Vérifier si le panier est vide
     if not st.session_state.panier:
-        st.warning("Votre panier est vide. Ajoutez des produits pour voir les indicateurs environnementaux.")
+        st.warning("Ajoutez des produits pour voir les indicateurs environnementaux.")
         return
 
     # Afficher le titre
