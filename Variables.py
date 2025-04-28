@@ -93,9 +93,17 @@ def variables():
         produits_synthese = produits_synthese.sort_values(by='Contribution (%)', ascending=False)
 
         # Affichage graphique de la contribution de chaque produit
-        noms_produits = [item["nom"] for item in st.session_state.panier]
+        # Créer un DataFrame temporaire pour aligner noms et contributions
+        df_noms = pd.DataFrame(st.session_state.panier)
+
+        # Fusionner sur le code CIQUAL pour avoir les bons noms alignés avec les bonnes contributions
+        produits_synthese = produits_synthese.merge(df_noms[['code_ciqual', 'nom']], left_on='Code CIQUAL', right_on='code_ciqual')
+
+        # Maintenant noms_produits et contribution sont alignés
+        noms_produits = produits_synthese['nom']
         contribution = produits_synthese['Contribution (%)']
 
+        # Tracer le graphique
         fig = px.bar(
             x=noms_produits,
             y=contribution,
@@ -103,4 +111,5 @@ def variables():
             title=f"Contribution des produits pour {selected_variable}"
         )
         st.plotly_chart(fig)
+
 
