@@ -11,7 +11,7 @@ def etapes_panier():
 
     # Vérification du panier
     if "panier" not in st.session_state or not st.session_state.panier:
-        st.warning("Le panier est vide. Ajoutez des produits pour voir l'analyse.")
+        st.warning("Ajoutez des produits pour voir l'analyse.")
         return
 
     codes_ciqual_panier = [int(produit["code_ciqual"]) for produit in st.session_state.panier]
