@@ -38,8 +38,10 @@ def score_panier():
 
         # Calcul du score moyen des sous-groupes d'aliments
         scores_moyens_sous_groupes = df_synthese_finale.groupby("Sous-groupe d'aliment")["Score Statistique Standardisé"].mean()
+        ###### affichage Lettre pour le score
         score_moyen_sous_groupes = scores_moyens_sous_groupes[df_panier["Sous-groupe d'aliment"].unique()].mean()
-
+        ###### affichage Lettre pour le score
+        
         st.subheader("📊 Score moyen du panier (Statistique Standardisé) et Score moyen pour ces types d'aliments")
 
         # Affichage sur une jauge combinée
