@@ -16,7 +16,6 @@ def score_panier():
 
     # Vérifier si le panier contient des produits
     if "panier" not in st.session_state or not st.session_state.panier:
-        st.warning("Votre panier est vide.")
         return
 
     # Extraire les codes CIQUAL des produits du panier
