@@ -2,26 +2,35 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
+@st.cache_data
+def charger_bdd():
+    return pd.read_csv("agribalyse-31-detail-par-etape.csv")
 
 def etapes_panier():
     st.header("Analyse des étapes du panier")
 
+    # Vérification du panier
     if "panier" not in st.session_state or not st.session_state.panier:
         st.warning("Ajoutez des produits pour voir l'analyse.")
         return
 
     codes_ciqual_panier = [int(produit["code_ciqual"]) for produit in st.session_state.panier]
+
+    # Charger la BDD étapes
     df_agribalyse = charger_bdd()
 
     if "Code CIQUAL" not in df_agribalyse.columns:
         st.error("Erreur : La colonne 'Code CIQUAL' est introuvable dans la BDD.")
         return
 
+    # Filtrer la BDD pour ne garder que les produits du panier
     df_panier = df_agribalyse[df_agribalyse["Code CIQUAL"].isin(codes_ciqual_panier)]
+
     if df_panier.empty:
         st.warning("Aucun des produits du panier ne correspond à la BDD étapes.")
         return
 
+    # Étapes et impacts disponibles
     etapes = ["Agriculture", "Transformation", "Emballage", "Transport", "Supermarché et distribution", "Consommation"]
     impacts = [
         "Score unique EF", "Changement climatique", "Appauvrissement de la couche d'ozone",
@@ -60,44 +69,49 @@ def etapes_panier():
         "Changement climatique - émissions liées au changement d'affectation des sols": 'kg CO2 eq/kg',
     }
 
-    etape_selectionnee = st.selectbox("Sélectionnez une étape :", etapes)
+    # Sélection de l'étape
+    etape_selectionnee = st.selectbox("Sélectionnez une étape à afficher :", etapes)
+
+    # Sélection de l'indicateur environnemental
     impact_selectionne = st.selectbox("Sélectionnez un indicateur d’impact environnemental :", impacts)
 
-    # Trouver la colonne correspondant à l’étape et l’impact
+    # Filtrer la colonne correspondant à l'étape + impact sélectionnés
     colonnes_match = [col for col in df_agribalyse.columns if etape_selectionnee in col and impact_selectionne in col]
 
     if not colonnes_match:
-        st.error(f"Aucune donnée trouvée pour l'étape '{etape_selectionnee}' et l'indicateur '{impact_selectionne}'.")
+        st.error(f"Aucune colonne trouvée pour l'étape '{etape_selectionnee}' et l'impact '{impact_selectionne}'.")
         return
 
-    colonne = colonnes_match[0]  # suppose qu’il n’y a qu’une colonne par combinaison
+    colonne = colonnes_match[0]  # suppose une seule correspondance
 
-    # Conversion en numérique
+    # Convertir la colonne en numérique
     df_panier[colonne] = pd.to_numeric(df_panier[colonne], errors="coerce")
 
-    # Moyenne simple du panier
-    moyenne_panier = df_panier[colonne].mean()
+    # Somme des valeurs du panier pour l'étape + impact sélectionnés
+    somme_valeurs_panier = df_panier[colonne].sum()
 
-    # Moyenne pondérée par sous-groupe
-    sous_groupes = df_panier["Sous-groupe d'aliment"]
-    occurrences_sg = sous_groupes.value_counts()
+    # Récupération des sous-groupes des produits du panier
+    sous_groupes_panier = df_panier["Sous-groupe d'aliment"]
 
-    moyennes_par_sg = df_agribalyse.groupby("Sous-groupe d'aliment")[colonne].mean()
+    # Moyennes des sous-groupes pour la colonne concernée
+    moyennes_sous_groupes = df_agribalyse.groupby("Sous-groupe d'aliment")[colonne].mean()
 
-    somme_ponderee = sum(moyennes_par_sg.get(sg, 0) * count for sg, count in occurrences_sg.items())
-    moyenne_ponderee = somme_ponderee / occurrences_sg.sum()
+    # Moyenne pondérée en tenant compte des répétitions des sous-groupes
+    occurrences_sous_groupes = sous_groupes_panier.value_counts()
+    somme_ponderee = sum(moyennes_sous_groupes.get(sg, 0) * count for sg, count in occurrences_sous_groupes.items())
+    moyenne_ponderee_sous_groupes = somme_ponderee / occurrences_sous_groupes.sum()
 
+    # Affichage des résultats
     unite = unites.get(impact_selectionne, "unité inconnue")
 
-    # Affichage
-    st.subheader(f"Résultats pour {impact_selectionne} ({etape_selectionnee})")
-    st.write(f"🔹 **Moyenne directe du panier** : {moyenne_panier:.4f} {unite}")
-    st.write(f"🔹 **Moyenne pondérée par sous-groupes** : {moyenne_ponderee:.4f} {unite}")
+    st.subheader(f"Analyse pour l'étape : {etape_selectionnee}")
+    st.write(f"🔹 **Somme des valeurs du panier** : {somme_valeurs_panier:.4f} {unite}")
+    st.write(f"🔹 **Moyenne pondérée des sous-groupes** : {moyenne_ponderee_sous_groupes:.4f} {unite}")
 
-    # Graphique
+    # Comparaison sous forme d'histogramme
     data_plot = pd.DataFrame({
-        "Catégorie": ["Moyenne du panier", "Moyenne pondérée par sous-groupes"],
-        "Valeur": [moyenne_panier, moyenne_ponderee]
+        "Catégorie": ["Somme des valeurs du panier", "Moyenne pondérée des sous-groupes"],
+        "Valeur": [somme_valeurs_panier, moyenne_ponderee_sous_groupes]
     })
 
     fig = px.bar(data_plot, x="Catégorie", y="Valeur", title=f"{impact_selectionne} - {etape_selectionnee}", color="Catégorie")
