@@ -68,29 +68,44 @@ def etapes_panier():
     # 🔽 Graphique radar comparatif
     # --------------------------
 
-    # Choisir une étape et une variable
+    # Choisir une variable parmi toutes les étapes
     variable_selectionnee = st.selectbox("Sélectionnez une variable pour le radar", colonnes_etape)
 
-    # Récupérer les valeurs pour le graphique radar
-    valeurs_panier = df_panier_normalise[variable_selectionnee].mean()
-    valeurs_panier_moyenne = panier_moyen_normalise[variable_selectionnee]
+    # Préparer les données pour le graphique radar
+    # On va créer un graphique radar avec les 6 étapes pour comparer la variable choisie
+    valeurs_panier = []
+    valeurs_panier_moyenne = []
 
-    categories = [variable_selectionnee]
+    for etape in etapes:
+        # Filtrer les colonnes pour chaque étape
+        colonnes_etape = [col for col in df_agribalyse.columns if etape in col]
 
+        if not colonnes_etape:
+            continue
+        
+        # Normaliser les valeurs de la variable sélectionnée pour chaque étape
+        df_panier_etape_normalise = centrer_reduire(df_panier[colonnes_etape], colonnes_etape)
+        valeurs_panier.append(df_panier_etape_normalise[variable_selectionnee].mean())
+        
+        # Moyenne des sous-groupes pour cette étape
+        moyennes_etape = moyennes_sous_groupes[variable_selectionnee]
+        valeurs_panier_moyenne.append(moyennes_etape.mean())
+
+    # Ajouter les données au graphique radar
     fig = go.Figure()
 
     # Ajouter les données du panier utilisateur
     fig.add_trace(go.Scatterpolar(
-        r=[valeurs_panier],
-        theta=categories,
+        r=valeurs_panier,
+        theta=etapes,
         fill='toself',
         name="Panier Utilisateur"
     ))
 
     # Ajouter les données du panier moyen
     fig.add_trace(go.Scatterpolar(
-        r=[valeurs_panier_moyenne],
-        theta=categories,
+        r=valeurs_panier_moyenne,
+        theta=etapes,
         fill='toself',
         name="Panier Moyen"
     ))
@@ -102,7 +117,7 @@ def etapes_panier():
                 range=[-1, 1]  # Car centré et réduit
             )
         ),
-        title=f"Comparaison des paniers pour l'étape {etape_selectionnee}",
+        title=f"Comparaison des paniers pour la variable '{variable_selectionnee}'",
         showlegend=True
     )
 
@@ -191,26 +206,4 @@ def etapes_panier():
     # Convertir la colonne en numérique
     df_panier[colonne] = pd.to_numeric(df_panier[colonne], errors="coerce")
 
-    # Moyenne brute du panier pour cet indicateur
-    moyenne_panier = df_panier[colonne].mean()
-
-    # Moyenne pondérée des sous-groupes
-    moyennes_sous_groupes = df_agribalyse.groupby("Sous-groupe d'aliment")[colonne].mean()
-    occurrences_sous_groupes = df_panier["Sous-groupe d'aliment"].value_counts()
-    somme_ponderee = sum(moyennes_sous_groupes.get(sg, 0) * count for sg, count in occurrences_sous_groupes.items())
-    moyenne_ponderee = somme_ponderee / occurrences_sous_groupes.sum()
-
-    # Affichage
-    unite = unites.get(impact_selectionne, "unité inconnue")
-
-    st.write(f"🔹 **Moyenne du panier pour** *{impact_selectionne}* : {moyenne_panier:.4f} {unite}")
-    st.write(f"🔹 **Moyenne pondérée des sous-groupes** : {moyenne_ponderee:.4f} {unite}")
-
-    # Deuxième graphique
-    data_plot2 = pd.DataFrame({
-        "Catégorie": ["Moyenne du panier", "Moyenne pondérée des sous-groupes"],
-        "Valeur": [moyenne_panier, moyenne_ponderee]
-    })
-
-    fig2 = px.bar(data_plot2, x="Catégorie", y="Valeur", title=f"{impact_selectionne} - {etape_selectionnee}", color="Catégorie")
-    st.plotly_chart(fig2)
+    # Moyenne brute du
