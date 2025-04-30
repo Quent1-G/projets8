@@ -1,3 +1,8 @@
+import streamlit as st
+import pandas as pd
+import plotly.express as px
+
+
 def etapes_panier():
     st.header("Analyse des étapes du panier")
 
