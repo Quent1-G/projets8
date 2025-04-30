@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import numpy as np  # Ajout pour le centrage-réduction
 
 @st.cache_data
 def charger_bdd():
@@ -38,17 +39,25 @@ def graphique_radar(df_agribalyse, df_panier, sous_groupes_panier, variable_sele
             valeurs_panier.append(0)
             valeurs_panier_moyenne.append(0)
 
+    # 🔽 Centrage-réduction uniquement pour les valeurs du radar
+    toutes_valeurs = np.array(valeurs_panier + valeurs_panier_moyenne)
+    moyenne = np.mean(toutes_valeurs)
+    ecart_type = np.std(toutes_valeurs) if np.std(toutes_valeurs) != 0 else 1
+
+    valeurs_panier_cr = [(v - moyenne) / ecart_type for v in valeurs_panier]
+    valeurs_panier_moyenne_cr = [(v - moyenne) / ecart_type for v in valeurs_panier_moyenne]
+
     fig_radar = go.Figure()
 
     fig_radar.add_trace(go.Scatterpolar(
-        r=valeurs_panier,
+        r=valeurs_panier_cr,
         theta=etapes,
         fill='toself',
         name='Panier utilisateur'
     ))
 
     fig_radar.add_trace(go.Scatterpolar(
-        r=valeurs_panier_moyenne,
+        r=valeurs_panier_moyenne_cr,
         theta=etapes,
         fill='toself',
         name='Panier moyen similaire'
@@ -59,7 +68,7 @@ def graphique_radar(df_agribalyse, df_panier, sous_groupes_panier, variable_sele
             radialaxis=dict(visible=True)
         ),
         showlegend=True,
-        title=f"Radar - {variable_selectionnee}"
+        title=f"Radar - {variable_selectionnee} (centré-réduit)"
     )
 
     st.plotly_chart(fig_radar)
