@@ -132,7 +132,7 @@ def etapes_panier():
 
     impacts = [
         "Score unique EF", "Changement climatique", "Appauvrissement de la couche d'ozone",
-        "Rayonnements ionisants", "Formation photochimique d'ozone", "Particules fines - Agriculture",
+        "Rayonnements ionisants", "Formation photochimique d'ozone", "Particules fines",
         "Effets toxicologiques sur la santé humaine : substances non-cancérogènes",
         "Effets toxicologiques sur la santé humaine : substances cancérogènes",
         "Acidification terrestre et eaux douces", "Eutrophisation eaux douces",
