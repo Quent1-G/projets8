@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import numpy as np
+from sklearn.preprocessing import StandardScaler
 
 @st.cache_data
 def charger_bdd():
@@ -38,17 +40,24 @@ def graphique_radar(df_agribalyse, df_panier, sous_groupes_panier, variable_sele
             valeurs_panier.append(0)
             valeurs_panier_moyenne.append(0)
 
+    # Standardisation des valeurs pour le radar
+    scaler = StandardScaler()
+    toutes_valeurs = np.array([valeurs_panier, valeurs_panier_moyenne]).T  # Transpose pour avoir les étapes en lignes
+    toutes_valeurs_std = scaler.fit_transform(toutes_valeurs)
+    valeurs_panier_std = toutes_valeurs_std[:, 0]
+    valeurs_panier_moyenne_std = toutes_valeurs_std[:, 1]
+
     fig_radar = go.Figure()
 
     fig_radar.add_trace(go.Scatterpolar(
-        r=valeurs_panier,
+        r=valeurs_panier_std,
         theta=etapes,
         fill='toself',
         name='Panier utilisateur'
     ))
 
     fig_radar.add_trace(go.Scatterpolar(
-        r=valeurs_panier_moyenne,
+        r=valeurs_panier_moyenne_std,
         theta=etapes,
         fill='toself',
         name='Panier moyen similaire'
@@ -59,7 +68,7 @@ def graphique_radar(df_agribalyse, df_panier, sous_groupes_panier, variable_sele
             radialaxis=dict(visible=True)
         ),
         showlegend=True,
-        title=f"Radar - {variable_selectionnee}"
+        title=f"Radar - {variable_selectionnee} (standardisé)"
     )
 
     st.plotly_chart(fig_radar)
@@ -183,15 +192,6 @@ def etapes_panier():
     unite = unites.get(impact_selectionne, "unité inconnue")
 
     st.write(f"🔹 **Moyenne du panier pour** *{impact_selectionne}* : {moyenne_panier:.4f} {unite}")
-    st.write(f"🔹 **Moyenne pondérée des sous-groupes** : {moyenne_ponderee:.4f} {unite}")
-
-    data_plot2 = pd.DataFrame({
-        "Catégorie": ["Moyenne du panier", "Moyenne pondérée des sous-groupes"],
-        "Valeur": [moyenne_panier, moyenne_ponderee]
-    })
-
-    fig2 = px.bar(data_plot2, x="Catégorie", y="Valeur", title=f"{impact_selectionne} - {etape_selectionnee}", color="Catégorie")
-    st.plotly_chart(fig2)
-
-    # 🔽 Ajouter ici le graphique radar
-    graphique_radar(df_agribalyse, df_panier, sous_groupes_panier, impact_selectionne)
+    st.write(f"🔹 **Moyenne pondérée des sous-groupes** : {moyenne_pond
+::contentReference[oaicite:6]{index=6}
+ 
