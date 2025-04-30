@@ -160,12 +160,59 @@ def etapes_panier():
     st.write(f"🔹 **Moyenne du panier** : {moyenne_panier:.4f} {unites[indicateur_selectionne]}")
     st.write(f"🔹 **Moyenne pondérée par sous-groupe** : {moyenne_sous_groupes:.4f} {unites[indicateur_selectionne]}")
 
-    fig_barres = px.bar(
-        x=["Moyenne du panier", "Moyenne pondérée par sous-groupe"],
-        y=[moyenne_panier, moyenne_sous_groupes],
-        labels={"x": "Méthode", "y": f"Valeur ({unites[indicateur_selectionne]})"},
-        title=f"Comparaison pour {indicateur_selectionne} ({etape_selectionnee})",
-        color=["Moyenne du panier", "Moyenne pondérée par sous-groupe"]
+    # === NOUVEAU : Diagramme en étoile pour l'indicateur sélectionné ===
+    st.subheader(f"Comparaison par étape – {indicateur_selectionne}")
+
+    valeurs_panier_indic = {}
+    moyennes_sous_groupes_indic = {}
+
+    for etape in etapes:
+        colonne_cible = None
+        for col in df_agribalyse.columns:
+            if indicateur_selectionne in col and etape in col:
+                colonne_cible = col
+                break
+
+        if not colonne_cible:
+            continue
+
+        df_panier[colonne_cible] = pd.to_numeric(df_panier[colonne_cible], errors='coerce')
+        df_agribalyse[colonne_cible] = pd.to_numeric(df_agribalyse[colonne_cible], errors='coerce')
+
+        # Moyenne directe du panier
+        valeurs_panier_indic[etape] = df_panier[colonne_cible].mean()
+
+        # Moyenne pondérée par sous-groupes
+        moyennes = df_agribalyse.groupby("Sous-groupe d'aliment")[colonne_cible].mean()
+        total, count = 0, 0
+
+        for sg in sous_groupes:
+            if sg in moyennes.index:
+                total += moyennes[sg]
+                count += 1
+
+        moyennes_sous_groupes_indic[etape] = total / count if count > 0 else 0
+
+    fig_indic_radar = go.Figure()
+
+    fig_indic_radar.add_trace(go.Scatterpolar(
+        r=list(valeurs_panier_indic.values()),
+        theta=list(valeurs_panier_indic.keys()),
+        fill='toself',
+        name="Panier (moyenne directe)"
+    ))
+
+    fig_indic_radar.add_trace(go.Scatterpolar(
+        r=list(moyennes_sous_groupes_indic.values()),
+        theta=list(moyennes_sous_groupes_indic.keys()),
+        fill='toself',
+        name="Panier (moyenne sous-groupes)"
+    ))
+
+    fig_indic_radar.update_layout(
+        polar=dict(radialaxis=dict(visible=True)),
+        showlegend=True,
+        title=f"{indicateur_selectionne} par étape"
     )
 
-    st.plotly_chart(fig_barres)
+    st.plotly_chart(fig_indic_radar)
