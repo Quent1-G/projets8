@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
 import plotly.graph_objects as go
 
 @st.cache_data
@@ -14,28 +13,27 @@ def etapes_panier():
         st.warning("Ajoutez des produits pour voir l'analyse.")
         return
 
+    # Codes des produits dans le panier
     codes_ciqual_panier = [int(produit["code_ciqual"]) for produit in st.session_state.panier]
 
+    # Charger la base de données
     df_agribalyse = charger_bdd()
 
     if "Code CIQUAL" not in df_agribalyse.columns:
         st.error("Erreur : La colonne 'Code CIQUAL' est introuvable dans la BDD.")
         return
 
+    # Filtrer les données du panier
     df_panier = df_agribalyse[df_agribalyse["Code CIQUAL"].isin(codes_ciqual_panier)]
 
     if df_panier.empty:
         st.warning("Aucun des produits du panier ne correspond à la BDD étapes.")
         return
 
+    # Définition des étapes
     etapes = ["Agriculture", "Transformation", "Emballage", "Transport", "Supermarché et distribution", "Consommation"]
 
-    # === DIAGRAMME EN ÉTOILE : Comparaison de toutes les étapes ===
-    st.subheader("Comparaison par étape (diagramme en étoile)")
-
-    valeurs_panier = {}
-    moyennes_sous_groupes = {}
-
+    # === LISTE DES INDICATEURS ===
     impacts = [
         'Score unique EF', 'Changement climatique', 'Appauvrissement de la couche d\'ozone',
         'Rayonnements ionisants', 'Formation photochimique d\'ozone', 'Particules fines - Agriculture',
@@ -50,6 +48,7 @@ def etapes_panier():
         'Changement climatique - émissions liées au changement d\'affectation des sols'
     ]
 
+    # Liste des unités pour chaque indicateur
     unites = {
         'Score unique EF': 'sans unité',
         'Changement climatique': 'kg CO2 eq/kg',
@@ -71,8 +70,9 @@ def etapes_panier():
         'Changement climatique - émissions biogéniques': 'kg CO2 eq/kg',
         'Changement climatique - émissions fossiles': 'kg CO2 eq/kg',
         'Changement climatique - émissions liées au changement d\'affectation des sols': 'kg CO2 eq/kg'
-    ]
+    }
 
+    # Sélectionner l'indicateur
     indicateur_selectionne = st.selectbox("Choisissez un indicateur :", impacts)
 
     # === Comparaison par étape et indicateur sélectionné ===
@@ -81,8 +81,10 @@ def etapes_panier():
     valeurs_panier_indic = {}
     moyennes_sous_groupes_indic = {}
 
+    # Analyser chaque étape
     for etape in etapes:
         colonne_cible = None
+        # Chercher la colonne correspondant à l'indicateur et à l'étape
         for col in df_agribalyse.columns:
             if indicateur_selectionne in col and etape in col:
                 colonne_cible = col
@@ -91,6 +93,7 @@ def etapes_panier():
         if not colonne_cible:
             continue
 
+        # Convertir les valeurs en numérique
         df_panier[colonne_cible] = pd.to_numeric(df_panier[colonne_cible], errors='coerce')
         df_agribalyse[colonne_cible] = pd.to_numeric(df_agribalyse[colonne_cible], errors='coerce')
 
@@ -132,3 +135,4 @@ def etapes_panier():
     )
 
     st.plotly_chart(fig_indic_radar)
+
