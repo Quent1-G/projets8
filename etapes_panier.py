@@ -30,32 +30,38 @@ def etapes_panier():
 
     etapes = ["Agriculture", "Transformation", "Emballage", "Transport", "Supermarché et distribution", "Consommation"]
 
-    # ==== RADAR COMPARATIF : toutes les étapes ====
+    # === DIAGRAMME EN ÉTOILE : "Score unique EF" sur toutes les étapes ===
+    st.subheader("Score unique EF par étape (diagramme en étoile)")
+
     valeurs_panier = {}
     moyennes_sous_groupes = {}
 
     for etape in etapes:
-        colonnes_etape = [col for col in df_agribalyse.columns if etape in col]
-        if not colonnes_etape:
+        colonnes_score_ef = [col for col in df_agribalyse.columns if etape in col and "Score unique EF" in col]
+
+        if not colonnes_score_ef:
             continue
 
-        df_panier[colonnes_etape] = df_panier[colonnes_etape].apply(pd.to_numeric, errors="coerce")
-        df_agribalyse[colonnes_etape] = df_agribalyse[colonnes_etape].apply(pd.to_numeric, errors="coerce")
+        df_panier[colonnes_score_ef] = df_panier[colonnes_score_ef].apply(pd.to_numeric, errors="coerce")
+        df_agribalyse[colonnes_score_ef] = df_agribalyse[colonnes_score_ef].apply(pd.to_numeric, errors="coerce")
 
-        somme_valeurs = df_panier[colonnes_etape].sum().sum()
-        valeurs_panier[etape] = somme_valeurs
+        # Moyenne directe du panier
+        moyenne_panier = df_panier[colonnes_score_ef].mean().mean()
+        valeurs_panier[etape] = moyenne_panier
 
+        # Moyenne pondérée par sous-groupes
         sous_groupes_panier = df_panier["Sous-groupe d'aliment"]
-        moyennes = df_agribalyse.groupby("Sous-groupe d'aliment")[colonnes_etape].mean()
+        moyennes = df_agribalyse.groupby("Sous-groupe d'aliment")[colonnes_score_ef].mean()
 
-        somme_moyennes_ponderees = 0
+        total = 0
+        count = 0
         for sous_groupe in sous_groupes_panier:
             if sous_groupe in moyennes.index:
-                somme_moyennes_ponderees += moyennes.loc[sous_groupe].sum()
+                total += moyennes.loc[sous_groupe].mean()
+                count += 1
 
-        moyennes_sous_groupes[etape] = somme_moyennes_ponderees
-
-    st.subheader("Comparaison des étapes du panier (radar)")
+        moyenne_sous_groupes = total / count if count > 0 else 0
+        moyennes_sous_groupes[etape] = moyenne_sous_groupes
 
     fig_radar = go.Figure()
 
@@ -63,27 +69,26 @@ def etapes_panier():
         r=list(valeurs_panier.values()),
         theta=list(valeurs_panier.keys()),
         fill='toself',
-        name="Panier (somme directe)"
+        name="Panier (moyenne directe)"
     ))
 
     fig_radar.add_trace(go.Scatterpolar(
         r=list(moyennes_sous_groupes.values()),
         theta=list(moyennes_sous_groupes.keys()),
         fill='toself',
-        name="Panier (moyenne par sous-groupe)"
+        name="Panier (moyenne sous-groupes)"
     ))
 
     fig_radar.update_layout(
         polar=dict(radialaxis=dict(visible=True)),
         showlegend=True,
-        title="Impact par étape (comparaison des méthodes de calcul)"
+        title="Score unique EF par étape"
     )
 
     st.plotly_chart(fig_radar)
 
-    # ==== GRAPHIQUE 2 : par étape + indicateur ====
-
-    st.subheader("Analyse détaillée par indicateur")
+    # === ANALYSE DÉTAILLÉE PAR ÉTAPE + INDICATEUR (ton code existant + nouvelle fonctionnalité en dessous) ===
+    st.subheader("Analyse détaillée par étape et indicateur")
 
     etape_selectionnee = st.selectbox("Étape à afficher :", etapes)
 
