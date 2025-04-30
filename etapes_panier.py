@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import numpy as np  # Ajout pour le centrage-réduction
+import numpy as np  # Pour la normalisation
 
 @st.cache_data
 def charger_bdd():
@@ -39,13 +39,18 @@ def graphique_radar(df_agribalyse, df_panier, sous_groupes_panier, variable_sele
             valeurs_panier.append(0)
             valeurs_panier_moyenne.append(0)
 
-    # 🔽 Centrage-réduction uniquement pour les valeurs du radar
-    toutes_valeurs = np.array(valeurs_panier + valeurs_panier_moyenne)
-    moyenne = np.mean(toutes_valeurs)
-    ecart_type = np.std(toutes_valeurs) if np.std(toutes_valeurs) != 0 else 1
+    # 🔽 Centrage-réduction par colonne
+    valeurs_panier_cr = []
+    valeurs_panier_moyenne_cr = []
 
-    valeurs_panier_cr = [(v - moyenne) / ecart_type for v in valeurs_panier]
-    valeurs_panier_moyenne_cr = [(v - moyenne) / ecart_type for v in valeurs_panier_moyenne]
+    for v, v_moyenne in zip(valeurs_panier, valeurs_panier_moyenne):
+        # Calcul de la moyenne et de l'écart type de chaque colonne (étape)
+        moyenne = np.mean([v, v_moyenne])
+        ecart_type = np.std([v, v_moyenne]) if np.std([v, v_moyenne]) != 0 else 1
+
+        # Application du centrage-réduction
+        valeurs_panier_cr.append((v - moyenne) / ecart_type)
+        valeurs_panier_moyenne_cr.append((v_moyenne - moyenne) / ecart_type)
 
     fig_radar = go.Figure()
 
@@ -132,7 +137,7 @@ def etapes_panier():
 
     impacts = [
         "Score unique EF", "Changement climatique", "Appauvrissement de la couche d'ozone",
-        "Rayonnements ionisants", "Formation photochimique d'ozone", "Particules fines",
+        "Rayonnements ionisants", "Formation photochimique d'ozone", "Particules fines - Agriculture",
         "Effets toxicologiques sur la santé humaine : substances non-cancérogènes",
         "Effets toxicologiques sur la santé humaine : substances cancérogènes",
         "Acidification terrestre et eaux douces", "Eutrophisation eaux douces",
@@ -199,8 +204,4 @@ def etapes_panier():
         "Valeur": [moyenne_panier, moyenne_ponderee]
     })
 
-    fig2 = px.bar(data_plot2, x="Catégorie", y="Valeur", title=f"{impact_selectionne} - {etape_selectionnee}", color="Catégorie")
-    st.plotly_chart(fig2)
-
-    # 🔽 Ajouter ici le graphique radar
-    graphique_radar(df_agribalyse, df_panier, sous_groupes_panier, impact_selectionne)
+    fig2 = px.bar(data_plot2, x="Catégorie", y="Valeur", title=f"{impact_selectionne} - {etape_selectionnee}", color="Cat
