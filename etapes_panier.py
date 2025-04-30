@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
+import numpy as np
 
 @st.cache_data
 def charger_bdd():
@@ -44,17 +46,80 @@ def etapes_panier():
     # Convertir en numérique
     df_panier[colonnes_etape] = df_panier[colonnes_etape].apply(pd.to_numeric, errors="coerce")
 
+    # Centrage et réduction des données par colonne
+    def centrer_reduire(df, colonnes):
+        df_normalise = df.copy()
+        for col in colonnes:
+            mean = df[col].mean()
+            std = df[col].std()
+            df_normalise[col] = (df[col] - mean) / std  # Centrer et réduire
+        return df_normalise
+
+    # Normalisation du panier et du panier moyen
+    df_panier_normalise = centrer_reduire(df_panier[colonnes_etape], colonnes_etape)
+
+    # Moyennes des sous-groupes pour les colonnes de l'étape sélectionnée
+    moyennes_sous_groupes = df_agribalyse.groupby("Sous-groupe d'aliment")[colonnes_etape].mean()
+
+    # Calcul de la moyenne des sous-groupes pour l'étape sélectionnée
+    panier_moyen_normalise = moyennes_sous_groupes[colonnes_etape].mean()
+
+    # --------------------------
+    # 🔽 Graphique radar comparatif
+    # --------------------------
+
+    # Choisir une étape et une variable
+    variable_selectionnee = st.selectbox("Sélectionnez une variable pour le radar", colonnes_etape)
+
+    # Récupérer les valeurs pour le graphique radar
+    valeurs_panier = df_panier_normalise[variable_selectionnee].mean()
+    valeurs_panier_moyenne = panier_moyen_normalise[variable_selectionnee]
+
+    categories = [variable_selectionnee]
+
+    fig = go.Figure()
+
+    # Ajouter les données du panier utilisateur
+    fig.add_trace(go.Scatterpolar(
+        r=[valeurs_panier],
+        theta=categories,
+        fill='toself',
+        name="Panier Utilisateur"
+    ))
+
+    # Ajouter les données du panier moyen
+    fig.add_trace(go.Scatterpolar(
+        r=[valeurs_panier_moyenne],
+        theta=categories,
+        fill='toself',
+        name="Panier Moyen"
+    ))
+
+    fig.update_layout(
+        polar=dict(
+            radialaxis=dict(
+                visible=True,
+                range=[-1, 1]  # Car centré et réduit
+            )
+        ),
+        title=f"Comparaison des paniers pour l'étape {etape_selectionnee}",
+        showlegend=True
+    )
+
+    st.plotly_chart(fig)
+
+    # --------------------------
+    # 🔽 Graphique 1 : Comparaison des sommes
+    # --------------------------
+
     # Somme des valeurs du panier pour l'étape sélectionnée
     somme_valeurs_panier = df_panier[colonnes_etape].sum().sum()
-
-    # Récupération des sous-groupes des produits du panier
-    sous_groupes_panier = df_panier["Sous-groupe d'aliment"]
 
     # Moyennes des sous-groupes pour les colonnes de l'étape sélectionnée
     moyennes_sous_groupes = df_agribalyse.groupby("Sous-groupe d'aliment")[colonnes_etape].mean()
 
     # Calcul de la somme des moyennes en tenant compte des répétitions
-    somme_moyennes_sous_groupes = sum(moyennes_sous_groupes.loc[sous_groupe].sum() for sous_groupe in sous_groupes_panier)
+    somme_moyennes_sous_groupes = sum(moyennes_sous_groupes.loc[sous_groupe].sum() for sous_groupe in df_panier["Sous-groupe d'aliment"])
 
     # Affichage des résultats
     st.subheader(f"Analyse pour l'étape : {etape_selectionnee}")
@@ -131,7 +196,7 @@ def etapes_panier():
 
     # Moyenne pondérée des sous-groupes
     moyennes_sous_groupes = df_agribalyse.groupby("Sous-groupe d'aliment")[colonne].mean()
-    occurrences_sous_groupes = sous_groupes_panier.value_counts()
+    occurrences_sous_groupes = df_panier["Sous-groupe d'aliment"].value_counts()
     somme_ponderee = sum(moyennes_sous_groupes.get(sg, 0) * count for sg, count in occurrences_sous_groupes.items())
     moyenne_ponderee = somme_ponderee / occurrences_sous_groupes.sum()
 
