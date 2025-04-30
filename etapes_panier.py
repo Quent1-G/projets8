@@ -69,20 +69,20 @@ def etapes_panier():
         r=list(valeurs_panier.values()),
         theta=list(valeurs_panier.keys()),
         fill='toself',
-        name="Panier (moyenne directe)"
+        name="Votre Panier"
     ))
 
     fig_radar.add_trace(go.Scatterpolar(
         r=list(moyennes_sous_groupes.values()),
         theta=list(moyennes_sous_groupes.keys()),
         fill='toself',
-        name="Panier (moyenne sous-groupes)"
+        name="Panier moyen similaire"
     ))
 
     fig_radar.update_layout(
         polar=dict(radialaxis=dict(visible=True)),
         showlegend=True,
-        title="Score unique EF par étape"
+        title="Comparaison de votre panier avec le panier moyen similaire - Score EF"
     )
 
     st.plotly_chart(fig_radar)
