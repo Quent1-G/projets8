@@ -205,5 +205,6 @@ def etapes_panier():
     })
 
     fig2 = px.bar(data_plot2, x="Catégorie", y="Valeur", title=f"{impact_selectionne} - {etape_selectionnee}", color="Catégorie")
-st.plotly_chart(fig2)
+    st.plotly_chart(fig2)
+
 
