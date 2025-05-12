@@ -204,4 +204,6 @@ def etapes_panier():
         "Valeur": [moyenne_panier, moyenne_ponderee]
     })
 
-    fig2 = px.bar(data_plot2, x="Catégorie", y="Valeur", title=f"{impact_selectionne} - {etape_selectionnee}", color="Cat
+    fig2 = px.bar(data_plot2, x="Catégorie", y="Valeur", title=f"{impact_selectionne} - {etape_selectionnee}", color="Catégorie")
+st.plotly_chart(fig2)
+
